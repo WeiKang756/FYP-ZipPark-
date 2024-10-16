@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "Firefly_Project_Title-_Parking_Management_System_for_Kota_Kinabalu_Objective-_To_develop_a_digital_p__2_-removebg-preview.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Firefly_Project_Title-_Parking_Management_System_for_Kota_Kinabalu_Objective-_To_develop_a_digital_p__2_-removebg-preview@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Firefly_Project_Title-_Parking_Management_System_for_Kota_Kinabalu_Objective-_To_develop_a_digital_p__2_-removebg-preview@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
