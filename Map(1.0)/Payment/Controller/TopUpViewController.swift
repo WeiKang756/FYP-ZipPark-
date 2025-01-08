@@ -1,221 +1,274 @@
-//
-//  TopUpViewController.swift
-//  Map(1.0)
-//
-//  Created by Wei Kang Tan on 03/11/2024.
-//
-
 import UIKit
 import StripePaymentSheet
 
 class TopUpViewController: UIViewController {
     
+    // MARK: - Properties
     private let paymentManager = PaymentManager.shared
     private var paymentSheet: PaymentSheet?
     private var selectedButton: UIButton? = nil
-    private let continueButton = UIButton(type: .system)
     private var amountSelected: Double = 0.0
     var walletAmount: String?
     
+    // MARK: - UI Components
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Add Money"
+        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.textColor = .black
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Select an amount to add money to your account."
+        label.font = .systemFont(ofSize: 16)
+        label.textColor = .darkGray
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var buttonStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.distribution = .fillEqually
+        stack.spacing = 15
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
+    private lazy var balanceLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
+        label.textColor = .black
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var continueButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Continue", for: .normal)
+        button.backgroundColor = .systemGray5
+        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
+        button.isEnabled = false
+        return button
+    }()
+    
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        configureViewController()
+        setupUI()
+        paymentManager.delegate = self
+        updateBalanceLabel()
+    }
+    
+    // MARK: - Setup
+    private func configureViewController() {
+        view.backgroundColor = .systemBackground
         navigationItem.title = "Top Up"
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
-        paymentManager.delegate = self
-        setupUI()
     }
     
-    // Setup the user interface for adding balance
-    func setupUI() {
-
-        // Create the title label
-        let titleLabel = UILabel()
-        titleLabel.text = "Add Money"
-        titleLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        titleLabel.textColor = .black
-        titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(titleLabel)
+    private func setupUI() {
+        setupViews()
+        setupAmountButtons()
+        setupConstraints()
+    }
+    
+    private func setupViews() {
+        [titleLabel, descriptionLabel, buttonStackView, balanceLabel, continueButton, loadingIndicator].forEach {
+            view.addSubview($0)
+        }
+    }
+    
+    private func updateBalanceLabel() {
+        if let amount = walletAmount {
+            balanceLabel.text = "Current Balance: RM \(amount)"
+        } else {
+            balanceLabel.text = "Current Balance: Loading..."
+        }
+    }
+    
+    private func setupAmountButtons() {
+        let amounts = [
+            "RM 10": 1000.0,
+            "RM 20": 2000.0,
+            "RM 50": 5000.0,
+            "RM 100": 10000.0,
+            "RM 200": 20000.0,
+            "RM 500": 50000.0
+        ].sorted { $0.value <= $1.value }
         
-        // Create the description label
-        let descriptionLabel = UILabel()
-        descriptionLabel.text = "Select an amount to add money to your account, and use it to make payment."
-        descriptionLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        descriptionLabel.textColor = .darkGray
-        descriptionLabel.textAlignment = .center
-        descriptionLabel.numberOfLines = 0
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(descriptionLabel)
+        var currentRowStack: UIStackView?
         
-        // Create the balance options buttons in a grid (1 row with 3 buttons)
-        let amounts = ["RM 10": 1000.0, "RM 20": 2000.0, "RM 50": 5000.0, "RM 100": 10000.0, "RM 200": 20000.0, "RM 500": 50000.0]
-        var buttons: [UIButton] = []
-        let sortedAmounts = amounts.sorted { $0.value < $1.value }
-        
-        for (amount, value) in sortedAmounts {
-            let button = UIButton(type: .system)
-            button.setTitle(amount, for: .normal)
-            button.backgroundColor = .systemGray6
-            button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-            button.setTitleColor(.black, for: .normal)
-            button.layer.cornerRadius = 10
-            button.addTarget(self, action: #selector(balanceButtonTapped(_:)), for: .touchUpInside)
-            button.tag = Int(value) // Set tag to identify the button value later
-            button.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(button)
-            buttons.append(button)
+        for (index, amount) in amounts.enumerated() {
+            if index % 3 == 0 {
+                currentRowStack = createRowStack()
+                buttonStackView.addArrangedSubview(currentRowStack!)
+            }
+            
+            let button = createAmountButton(title: amount.key, value: amount.value)
+            currentRowStack?.addArrangedSubview(button)
         }
         
-        // Create a UIStackView to hold the buttons in a grid layout
-        let buttonStackView = UIStackView()
-        buttonStackView.axis = .vertical
-        buttonStackView.alignment = .fill
-        buttonStackView.distribution = .fillProportionally
-        buttonStackView.spacing = 15
-        buttonStackView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(buttonStackView)
-        
-        // Create horizontal stacks of buttons
-        for i in stride(from: 0, to: buttons.count, by: 3) {
-            let rowStackView = UIStackView(arrangedSubviews: Array(buttons[i..<min(i + 3, buttons.count)]))
-            rowStackView.axis = .horizontal
-            rowStackView.alignment = .fill
-            rowStackView.distribution = .fillEqually
-            rowStackView.spacing = 15
-            buttonStackView.addArrangedSubview(rowStackView)
+        // Fill remaining spaces in last row if needed
+        if let lastRow = currentRowStack, amounts.count % 3 != 0 {
+            let remainingSpaces = 3 - (amounts.count % 3)
+            for _ in 0..<remainingSpaces {
+                let spacerView = UIView()
+                lastRow.addArrangedSubview(spacerView)
+            }
         }
-        
-        // Create the balance label
-        let balanceLabel = UILabel()
-        if let walletAmount = walletAmount{
-            balanceLabel.text = "Balance: \(walletAmount)"
-        } else{
-            print("Fail to get wallet balance")
-            balanceLabel.text = "Balance: N/A"
-        }
-        balanceLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        balanceLabel.textColor = .black
-        balanceLabel.textAlignment = .center
-        balanceLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(balanceLabel)
-        
-        // Create the continue button
-        continueButton.setTitle("Continue", for: .normal)
-        continueButton.backgroundColor = .systemGray5
-        continueButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        continueButton.setTitleColor(.white, for: .normal)
-        continueButton.layer.cornerRadius = 10
-        continueButton.isEnabled = false
-        continueButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
-        continueButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(continueButton)
-        
-        // Setup constraints for UI elements
+    }
+    
+    private func createRowStack() -> UIStackView {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.distribution = .fillEqually
+        stack.spacing = 12
+        return stack
+    }
+    
+    private func createAmountButton(title: String, value: Double) -> UIButton {
+        let button = UIButton(type: .system)
+        button.setTitle(title, for: .normal)
+        button.backgroundColor = .systemGray6
+        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        button.setTitleColor(.black, for: .normal)
+        button.layer.cornerRadius = 12
+        button.tag = Int(value)
+        button.addTarget(self, action: #selector(balanceButtonTapped(_:)), for: .touchUpInside)
+        button.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        return button
+    }
+    
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            buttonStackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 30),
+            balanceLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 24),
+            balanceLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            balanceLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            buttonStackView.topAnchor.constraint(equalTo: balanceLabel.bottomAnchor, constant: 32),
             buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            balanceLabel.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 30),
-            balanceLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            continueButton.topAnchor.constraint(equalTo: balanceLabel.bottomAnchor, constant: 30),
+            continueButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             continueButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             continueButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            continueButton.heightAnchor.constraint(equalToConstant: 50)
+            continueButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            loadingIndicator.centerXAnchor.constraint(equalTo: continueButton.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: continueButton.centerYAnchor)
         ])
     }
     
-    @objc func cancelButtonTapped() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func balanceButtonTapped(_ sender: UIButton) {
-        // Handle button tap, using the tag to identify which button was tapped
-        if let selectedButton = selectedButton {
-            // Reset previously selected button to default appearance
-            selectedButton.backgroundColor = .systemGray6
-            selectedButton.setTitleColor(.black, for: .normal)
+    // MARK: - Actions
+    @objc private func balanceButtonTapped(_ sender: UIButton) {
+        UIView.animate(withDuration: 0.2) {
+            // Reset previous selection
+            self.selectedButton?.backgroundColor = .systemGray6
+            self.selectedButton?.setTitleColor(.black, for: .normal)
+            
+            // Set new selection
+            self.selectedButton = sender
+            self.selectedButton?.backgroundColor = .black
+            self.selectedButton?.setTitleColor(.white, for: .normal)
+            
+            // Update amount and continue button
+            self.amountSelected = Double(sender.tag)
+            self.continueButton.backgroundColor = .black
+            self.continueButton.isEnabled = true
         }
-        
-        // Set the new selected button
-        selectedButton = sender
-        selectedButton?.backgroundColor = .black
-        selectedButton?.setTitleColor(.white, for: .normal)
-        
-        // Update the amountSelected variable
-        amountSelected = Double(sender.tag)
-        
-        // Enable the continue button
-        continueButton.backgroundColor = .black
-        continueButton.isEnabled = true
     }
     
-    @objc func continueButtonTapped() {
-        print("User selected amount to top up: RM \(amountSelected / 100)")
-        // Trigger the creation of a payment intent or perform other actions
-        // Example: checkout(amount: amountSelected)
+    @objc private func continueButtonTapped() {
+        guard amountSelected > 0 else { return }
+        
+        loadingIndicator.startAnimating()
+        continueButton.setTitle("", for: .normal)
+        continueButton.isEnabled = false
         
         paymentManager.createPaymentIntent(amount: amountSelected)
     }
     
-
-    
-    // Setup the PaymentSheet with the provided client secret, ephemeral key secret, and customer ID
-    func setupPaymentSheet(clientSecret: String, ephemeralKeySecret: String, customerId: String) {
-        // Set the publishable key for Stripe
-        STPAPIClient.shared.publishableKey = "pk_test_51PTWrT1sc4VuKoffQkWIq0IhT7ZUkqLKQgfwv8lWVhUjCWauvO1IHCmBv4BaHRB2hx0M8Kx9GFxkFwalv084yo6F0008njRZXa"
+    private func handlePaymentCompletion(success: Bool) {
+        loadingIndicator.stopAnimating()
+        continueButton.setTitle("Continue", for: .normal)
+        continueButton.isEnabled = true
         
-        // Create a PaymentSheet configuration
-        var configuration = PaymentSheet.Configuration()
-        configuration.merchantDisplayName = "Zip Park" // Display name for the merchant
-        configuration.customer = .init(id: customerId, ephemeralKeySecret: ephemeralKeySecret)
-        
-        // Initialize the PaymentSheet with the clientSecret and configuration
-        self.paymentSheet = PaymentSheet(paymentIntentClientSecret: clientSecret, configuration: configuration)
-    }
-    
-    // Function to present the PaymentSheet to the user
-    func presentPaymentSheet() {
-        paymentSheet?.present(from: self) { paymentResult in
-            // Handle the result of the payment
-            switch paymentResult {
-            case .completed:
-                self.navigationController?.popViewController(animated: true)
-                print("Payment successful!") // Payment was successful
-            case .canceled:
-                print("Payment canceled.") // User canceled the payment
-            case .failed(let error):
-                print("Payment failed: \(error.localizedDescription)") // Payment failed with an error
-            }
+        if success {
+            navigationController?.popViewController(animated: true)
         }
     }
 }
 
-// Extension to handle PaymentManagerDelegate methods
+// MARK: - PaymentManagerDelegate
 extension TopUpViewController: PaymentManagerDelegate {
     func paymentIntentDidCreate(_ paymentSheetRequest: PaymentSheetRequest) {
-        // Log the received clientSecret and ephemeralKeySecret for debugging
-        print("Received clientSecret: \(paymentSheetRequest.clientSecret)")
-        print("Received ephemeralKeySecret: \(paymentSheetRequest.ephemeralKeySecret)")
+        setupPaymentSheet(
+            clientSecret: paymentSheetRequest.clientSecret,
+            ephemeralKeySecret: paymentSheetRequest.ephemeralKeySecret,
+            customerId: paymentSheetRequest.customerId
+        )
         
-        // Setup the PaymentSheet with the received parameters
-        setupPaymentSheet(clientSecret: paymentSheetRequest.clientSecret, ephemeralKeySecret: paymentSheetRequest.ephemeralKeySecret, customerId: paymentSheetRequest.customerId)
+        DispatchQueue.main.async { [weak self] in
+            self?.presentPaymentSheet()
+        }
+    }
+    
+    private func setupPaymentSheet(clientSecret: String, ephemeralKeySecret: String, customerId: String) {
+        STPAPIClient.shared.publishableKey = "pk_test_51PTWrT1sc4VuKoffQkWIq0IhT7ZUkqLKQgfwv8lWVhUjCWauvO1IHCmBv4BaHRB2hx0M8Kx9GFxkFwalv084yo6F0008njRZXa"
         
-        // Present the PaymentSheet on the main thread
-        DispatchQueue.main.async {
-            self.presentPaymentSheet()
+        var configuration = PaymentSheet.Configuration()
+        configuration.merchantDisplayName = "Zip Park"
+        configuration.customer = .init(id: customerId, ephemeralKeySecret: ephemeralKeySecret)
+        
+        paymentSheet = PaymentSheet(paymentIntentClientSecret: clientSecret, configuration: configuration)
+    }
+    
+    private func presentPaymentSheet() {
+        loadingIndicator.stopAnimating()
+        continueButton.setTitle("Continue", for: .normal)
+        
+        paymentSheet?.present(from: self) { [weak self] paymentResult in
+            switch paymentResult {
+            case .completed:
+                self?.handlePaymentCompletion(success: true)
+            case .canceled:
+                self?.handlePaymentCompletion(success: false)
+            case .failed(let error):
+                print("Payment failed: \(error.localizedDescription)")
+                self?.handlePaymentCompletion(success: false)
+                // Show error alert here
+            }
         }
     }
 }

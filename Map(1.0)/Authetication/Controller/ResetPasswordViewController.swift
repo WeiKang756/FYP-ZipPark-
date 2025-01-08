@@ -174,7 +174,6 @@ extension ResetPasswordViewController: UITextFieldDelegate {
 extension ResetPasswordViewController: AuthManagerDelegate {
     
     func didUpdatePassword() {
-        SupabaseManager.shared.signOut()
         DispatchQueue.main.async {
             self.passwordTextField.layer.borderColor = UIColor.systemGreen.cgColor
             self.confirmPasswordTextField.layer.borderColor = UIColor.systemGreen.cgColor

@@ -12,6 +12,7 @@ class TabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         // Create view controllers
         let firstViewController = HomeViewController()
         firstViewController.tabBarItem.image = UIImage(systemName: "house")

@@ -14,4 +14,16 @@ struct AvailableParkingSpotModel {
     let distance: Double
     let areaName: String
     let streetName: String
+    
+    struct ParkingSpotModel {
+        let parkingSpotID: Int
+        let isAvailable: Bool
+        let type: String
+        let latitude: Double
+        let longitude: Double
+        let streetID: Int
+        let distance: Double?
+        let areaName: String?
+        let streetName: String?
+    }
 }

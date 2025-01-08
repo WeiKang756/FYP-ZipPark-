@@ -8,13 +8,13 @@
 import Foundation
 import MapKit
 
-class ParkingAnnotation: NSObject, MKAnnotation{
-    let patkingLotID: String
+class ParkingAnnotation: NSObject, MKAnnotation {
+    let parkingLotID: String
     let coordinate: CLLocationCoordinate2D
-    let parkingSpotModel: ParkingSpotModel
-    
-    init(patkingLotID: String, coordinate: CLLocationCoordinate2D, parkingSpotModel: ParkingSpotModel) {
-        self.patkingLotID = patkingLotID
+    let parkingSpotModel: ParkingSpotModel?
+
+    init(parkingLotID: String, coordinate: CLLocationCoordinate2D, parkingSpotModel: ParkingSpotModel? = nil) {
+        self.parkingLotID = parkingLotID
         self.coordinate = coordinate
         self.parkingSpotModel = parkingSpotModel
     }

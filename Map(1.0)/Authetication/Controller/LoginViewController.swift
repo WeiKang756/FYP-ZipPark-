@@ -1,86 +1,263 @@
-//
-//  LoginViewController.swift
-//  Map(1.0)
-//
-//  Created by Wei Kang Tan on 09/10/2024.
-//
-
 import UIKit
 
 class LoginViewController: UIViewController {
-
-    @IBOutlet weak var emailTextfield: UITextField!
-    @IBOutlet weak var passwordTextField: UITextField!
-    @IBOutlet weak var createAccountButton: UIButton!
-    @IBOutlet weak var forgotPasswordButton: UIButton!
-    @IBOutlet weak var loginButton: UIButton!
-    @IBOutlet weak var errorLabel: UILabel!
-    @IBOutlet weak var emailErrorLabel: UILabel!
     
+    // MARK: - UI Components
+    private let headerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Welcome to ZipPark"
+        label.font = .systemFont(ofSize: 28, weight: .bold)
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let welcomeImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "white_logo")
+        imageView.tintColor = .white
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Sign in to continue"
+        label.font = .systemFont(ofSize: 16)
+        label.textColor = .white.withAlphaComponent(0.8)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let emailTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Email"
+        textField.borderStyle = .none
+        textField.layer.cornerRadius = 12
+        textField.backgroundColor = .systemGray6
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private let passwordTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Password"
+        textField.borderStyle = .none
+        textField.layer.cornerRadius = 12
+        textField.backgroundColor = .systemGray6
+        textField.isSecureTextEntry = true
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private let loginButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Log In", for: .normal)
+        button.backgroundColor = .black
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let forgotPasswordButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Forgot Password?", for: .normal)
+        button.setTitleColor(.systemGray, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let createAccountButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Don't have an account? Sign Up", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let errorLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .systemRed
+        label.font = .systemFont(ofSize: 14)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    // MARK: - Properties
     let supabase = SupabaseManager.shared
     let authManager = AuthManager.shared
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        authManager.delegate = self
-
-        view.backgroundColor = .white
-        self.navigationItem.backButtonTitle = ""
-        self.navigationController?.navigationBar.tintColor = .black
-        let emailIcon = UIImage(systemName: "envelope")
-        let passwordIcon = UIImage(systemName: "key.horizontal")
-        let emailIconView = UIImageView(frame: CGRect(x: 10, y: 10, width: 35, height: 20))
-        emailIconView.image = emailIcon
-        let emailPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 55, height: 40))
-        emailPaddingView.addSubview(emailIconView)
-        
-        let passwordIconView = UIImageView(frame: CGRect(x: 10, y: 10, width: 35, height: 20))
-        passwordIconView.image = passwordIcon
-        let passwordPaddingView = UIView(frame:  CGRect(x: 0, y: 0, width: 55, height: 40))
-        passwordPaddingView.addSubview(passwordIconView)
-        
-        emailTextfield.layer.cornerRadius = 12.0
-        emailTextfield.layer.borderWidth = 1.0
-        emailTextfield.layer.borderColor = UIColor.systemGray.cgColor
-        emailTextfield.leftView = emailPaddingView
-        emailTextfield.leftViewMode = .always
-        
-        passwordTextField.layer.cornerRadius = 12.0
-        passwordTextField.layer.borderWidth = 1.0
-        passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
-        passwordTextField.leftView = passwordPaddingView
-        passwordTextField.leftViewMode = .always
-        
-        emailTextfield.delegate = self
-        passwordTextField.delegate = self
+        setupUI()
+        setupActions()
+        setupDelegates()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         authManager.delegate = self
         resetToDefault()
     }
     
-    func resetToDefault() {
-        // Reset the borders to the default color before validation
-        let defaultBorderColor = UIColor.systemGray.cgColor
+    // MARK: - Setup
+    private func setupUI() {
+        view.backgroundColor = .systemBackground
         
-        emailTextfield.layer.borderColor = defaultBorderColor
-        passwordTextField.layer.borderColor = defaultBorderColor
-        errorLabel.isHidden = true
+        setupHeaderView()
+        setupTextFields()
+        setupButtons()
     }
     
-
-    @IBAction func loginButtonPressed(_ sender: UIButton) {
-//        performSegue(withIdentifier: "goToMapVC", sender: self)
-        guard let email = emailTextfield.text else {
-            print("Email Text Field is empty")
+    private func setupHeaderView() {
+        view.addSubview(headerView)
+        headerView.addSubview(welcomeImageView)
+        headerView.addSubview(titleLabel)
+        headerView.addSubview(subtitleLabel)
+        
+        NSLayoutConstraint.activate([
+            headerView.topAnchor.constraint(equalTo: view.topAnchor),
+            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            headerView.heightAnchor.constraint(equalToConstant: 240), // Increased height to accommodate image
+            
+            welcomeImageView.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 80),
+            welcomeImageView.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
+            welcomeImageView.widthAnchor.constraint(equalToConstant: 80),
+            welcomeImageView.heightAnchor.constraint(equalToConstant: 80),
+            
+            titleLabel.bottomAnchor.constraint(equalTo: subtitleLabel.topAnchor, constant: -8),
+            titleLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
+            
+            subtitleLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -20),
+            subtitleLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20)
+        ])
+    }
+    
+    private func setupTextFields() {
+        view.addSubview(emailTextField)
+        view.addSubview(passwordTextField)
+        view.addSubview(errorLabel)
+        
+        setupTextField(emailTextField, withIcon: "envelope")
+        setupTextField(passwordTextField, withIcon: "lock")
+        
+        NSLayoutConstraint.activate([
+            emailTextField.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 40),
+            emailTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            emailTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            emailTextField.heightAnchor.constraint(equalToConstant: 50),
+            
+            passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 16),
+            passwordTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            passwordTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            passwordTextField.heightAnchor.constraint(equalToConstant: 50),
+            
+            errorLabel.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 8),
+            errorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            errorLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
+    }
+    
+    private func setupTextField(_ textField: UITextField, withIcon iconName: String) {
+        let iconView = UIImageView(image: UIImage(systemName: iconName))
+        iconView.tintColor = .systemGray
+        iconView.contentMode = .scaleAspectFit
+        
+        let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 55, height: 40))
+        iconView.frame = CGRect(x: 15, y: 10, width: 20, height: 20)
+        containerView.addSubview(iconView)
+        
+        textField.leftView = containerView
+        textField.leftViewMode = .always
+    }
+    
+    private func setupButtons() {
+        view.addSubview(loginButton)
+        view.addSubview(forgotPasswordButton)
+        view.addSubview(createAccountButton)
+        
+        NSLayoutConstraint.activate([
+            loginButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: 24),
+            loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            loginButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            forgotPasswordButton.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 16),
+            forgotPasswordButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            createAccountButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            createAccountButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
+    
+    private func setupActions() {
+        loginButton.addTarget(self, action: #selector(loginButtonPressed), for: .touchUpInside)
+        forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordButtonPressed), for: .touchUpInside)
+        createAccountButton.addTarget(self, action: #selector(createAccountButtonPressed), for: .touchUpInside)
+    }
+    
+    private func setupDelegates() {
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+    }
+    
+    // MARK: - Helper Methods
+    private func resetToDefault() {
+        errorLabel.isHidden = true
+        emailTextField.backgroundColor = .systemGray6
+        passwordTextField.backgroundColor = .systemGray6
+    }
+    
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    @MainActor
+    private func setRootViewControllerToHome() {
+        let vcController = HomeViewController()
+        let navigationController = UINavigationController(rootViewController: vcController)
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
             return
         }
         
-        guard let password = passwordTextField.text else {
-            print("Password Text Field is empty")
+        window.rootViewController = navigationController
+        window.makeKeyAndVisible()
+        
+        UIView.transition(with: window,
+                         duration: 0.5,
+                         options: [.transitionFlipFromRight],
+                         animations: nil,
+                         completion: nil)
+    }
+    
+    // MARK: - Actions
+    @objc private func loginButtonPressed() {
+        guard let email = emailTextField.text, !email.isEmpty else {
+            showAlert(message: "Please enter your email")
+            return
+        }
+        
+        guard let password = passwordTextField.text, !password.isEmpty else {
+            showAlert(message: "Please enter your password")
             return
         }
         
@@ -88,118 +265,64 @@ class LoginViewController: UIViewController {
         authManager.signIn(email: email, password: password)
     }
     
-    @IBAction func forgottenPasswordButtonPressed(_ sender: Any) {
+    @objc private func forgotPasswordButtonPressed() {
         let floatingVC = FloatingViewController()
         floatingVC.modalPresentationStyle = .overFullScreen
         floatingVC.modalTransitionStyle = .crossDissolve
         floatingVC.delegate = self
-        present(floatingVC, animated: true, completion: nil)
+        present(floatingVC, animated: true)
     }
     
-    func showAlert(message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+    @objc private func createAccountButtonPressed() {
+        let vc = RegisterViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
-    
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "goToHomeScreen" {
-//            if let homeViewController = segue.destination as? HomeViewController {
-//                // You can pass any data to HomeViewController if needed
-//                // homeViewController.data = ...
-//            }
-//        }
-//    }
 }
 
-//MARK: FloatingViewControllerDelegate
+// MARK: - FloatingViewControllerDelegate
 extension LoginViewController: FloatingViewControllerDelegate {
     func didPressSignInWithOTPButton() {
         let vc = EnterEmailViewController()
         vc.type = .signInWithOTP
-        self.navigationController?.pushViewController(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     func didPressResetPasswordButton() {
         let vc = EnterEmailViewController()
         vc.type = .resetPassword
-        self.navigationController?.pushViewController(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
-//MARK: - UITextFieldDelegate
+// MARK: - UITextFieldDelegate
 extension LoginViewController: UITextFieldDelegate {
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
+        if textField == emailTextField {
+            passwordTextField.becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder()
+            loginButtonPressed()
+        }
         return true
     }
 }
 
+// MARK: - AuthManagerDelegate
 extension LoginViewController: AuthManagerDelegate {
     func didSignIn() {
-        // Create the Tab Bar Controller
         DispatchQueue.main.async {
             self.setRootViewControllerToHome()
         }
     }
     
     func didSignInFail(_ error: String) {
-        DispatchQueue.main.async{ [self] in
-            emailTextfield.layer.borderColor = UIColor.systemRed.cgColor
-            passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
-            errorLabel.isHidden = false
-            errorLabel.text = error
-            showAlert(message: error)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.emailTextField.backgroundColor = .systemRed.withAlphaComponent(0.1)
+            self.passwordTextField.backgroundColor = .systemRed.withAlphaComponent(0.1)
+            self.errorLabel.isHidden = false
+            self.errorLabel.text = error
+            self.showAlert(message: error)
         }
-    }
-    
-    @MainActor
-    private func setRootViewControllerToHome() {
-        let vcController = HomeViewController()
-        let navigationController = UINavigationController(rootViewController: vcController)
-    //        navigationController.navigationBar.prefersLargeTitles = true
-
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first else {
-            return
-        }
-
-        window.rootViewController = navigationController
-        window.makeKeyAndVisible()
-
-        UIView.transition(with: window,
-                          duration: 0.5,
-                          options: [.transitionFlipFromRight],
-                          animations: nil,
-                          completion: nil)
     }
 }
-
-
-//MARK: - <#header section>
-
-
-    
-//    @IBAction func buttonTapped(_ sender: UIButton) {
-//        performSegue(withIdentifier: "goToProgrammaticVC", sender: self)
-//    }
-    
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "goToMapVC" {
-//            let destinationVC = MapViewController()
-//            segue.destination.addChild(destinationVC)
-//            segue.destination.view.addSubview(destinationVC.view)
-//            destinationVC.didMove(toParent: segue.destination)
-//        }
-//    }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-

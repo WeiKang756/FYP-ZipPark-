@@ -1,3 +1,4 @@
+
 //
 //  CreateStripeCustomerResponse.swift
 //  Map(1.0)

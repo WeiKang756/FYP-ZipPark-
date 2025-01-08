@@ -5,6 +5,7 @@
 //  Created by Wei Kang Tan on 04/10/2024.
 //
 
+
 import Foundation
 
 struct ParkingSpotData: Decodable {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 protocol ParkingSessionManagerDelegate {
     func didFetchSession(_ parkingSession: ParkingSession)
 }

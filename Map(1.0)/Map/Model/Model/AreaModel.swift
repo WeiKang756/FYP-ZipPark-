@@ -5,6 +5,7 @@
 //  Created by Wei Kang Tan on 21/09/2024.
 //
 
+
 import Foundation
 
 struct AreaModel {
@@ -18,12 +19,15 @@ struct AreaModel {
     let numYellow: Int
     let numRed: Int
     let numDisable: Int
+
     var availableParkingString: String {
         return String(availableParking)
     }
     var totalParkingString: String {
         return String(totalParking)
     }
-    var distance: Double?  
+    var distance: Double?
+
 }
+
 

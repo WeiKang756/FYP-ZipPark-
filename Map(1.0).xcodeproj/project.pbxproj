@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		110129412CD6128800CD6B4C /* WalletData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110129402CD6128300CD6B4C /* WalletData.swift */; };
+		110BB0942D153E460050C718 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 110BB0932D153E460050C718 /* Supabase */; };
+		110BB0962D153E600050C718 /* StripeIdentity in Frameworks */ = {isa = PBXBuildFile; productRef = 110BB0952D153E600050C718 /* StripeIdentity */; };
+		110BB0982D153E600050C718 /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 110BB0972D153E600050C718 /* StripePaymentSheet */; };
+		110BB09A2D153E600050C718 /* StripePayments in Frameworks */ = {isa = PBXBuildFile; productRef = 110BB0992D153E600050C718 /* StripePayments */; };
+		110BB09C2D153E600050C718 /* StripePaymentsUI in Frameworks */ = {isa = PBXBuildFile; productRef = 110BB09B2D153E600050C718 /* StripePaymentsUI */; };
 		110C34D32CC52CBC00E8FBFC /* ParkingSpotArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110C34D22CC52CB200E8FBFC /* ParkingSpotArray.swift */; };
 		11158FC52CE17667006F7255 /* AvailableParkingSpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11158FC42CE17667006F7255 /* AvailableParkingSpotModel.swift */; };
 		11158FC72CE176D9006F7255 /* AvailableParkingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11158FC62CE176CF006F7255 /* AvailableParkingData.swift */; };
@@ -15,12 +20,6 @@
 		113AE62D2CC9908100F785C8 /* FilterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113AE62C2CC9908100F785C8 /* FilterButton.swift */; };
 		113AE62F2CC990A300F785C8 /* StreetInformationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113AE62E2CC990A300F785C8 /* StreetInformationViewController.swift */; };
 		113B112D2CA8CC8F0042D5F2 /* ParkingInformationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113B112C2CA8CC8F0042D5F2 /* ParkingInformationPanel.swift */; };
-		113B11302CAC96270042D5F2 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 113B112F2CAC96270042D5F2 /* Auth */; };
-		113B11322CAC96270042D5F2 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 113B11312CAC96270042D5F2 /* Functions */; };
-		113B11342CAC96270042D5F2 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 113B11332CAC96270042D5F2 /* PostgREST */; };
-		113B11362CAC96270042D5F2 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 113B11352CAC96270042D5F2 /* Realtime */; };
-		113B11382CAC96270042D5F2 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 113B11372CAC96270042D5F2 /* Storage */; };
-		113B113A2CAC96270042D5F2 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 113B11392CAC96270042D5F2 /* Supabase */; };
 		113B113C2CAD5FDE0042D5F2 /* MapManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113B113B2CAD5FDE0042D5F2 /* MapManager.swift */; };
 		113B113E2CAD66F00042D5F2 /* StreetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113B113D2CAD66F00042D5F2 /* StreetModel.swift */; };
 		113B11402CAD68420042D5F2 /* ParkingAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113B113F2CAD68420042D5F2 /* ParkingAnnotation.swift */; };
@@ -49,14 +48,11 @@
 		114BA2C82C9ADA5600009B31 /* Map_1_0_UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA2C72C9ADA5600009B31 /* Map_1_0_UITestsLaunchTests.swift */; };
 		114BA3112C9B506000009B31 /* AreaAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA3102C9B506000009B31 /* AreaAnnotation.swift */; };
 		114BA3142C9DDB9E00009B31 /* InfomationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA3132C9DDB9E00009B31 /* InfomationPanel.swift */; };
-		114BA3172C9DE15200009B31 /* FloatingPanel in Frameworks */ = {isa = PBXBuildFile; productRef = 114BA3162C9DE15200009B31 /* FloatingPanel */; };
 		114BA31C2C9E0B6B00009B31 /* AreaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA31B2C9E0B6B00009B31 /* AreaModel.swift */; };
 		114BA31E2C9E0C8200009B31 /* SampleParkingSpotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA31D2C9E0C8200009B31 /* SampleParkingSpotModel.swift */; };
 		114BA3202C9E0DB900009B31 /* UserLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA31F2C9E0DB900009B31 /* UserLocation.swift */; };
 		114BA32A2C9E1FA500009B31 /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 114BA3292C9E1FA500009B31 /* TableViewCell.xib */; };
 		114BA32B2C9E1FA500009B31 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA3282C9E1FA500009B31 /* TableViewCell.swift */; };
-		114BA3302C9F2A3200009B31 /* ParkingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 114BA32F2C9F2A3200009B31 /* ParkingTableViewCell.xib */; };
-		114BA3312C9F2A3200009B31 /* ParkingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114BA32E2C9F2A3200009B31 /* ParkingTableViewCell.swift */; };
 		115187262CE9407900B21AC4 /* ParkingSpotDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115187252CE9407900B21AC4 /* ParkingSpotDetailsViewController.swift */; };
 		1151872C2CEA008000B21AC4 /* ZoneInfoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1151872B2CEA008000B21AC4 /* ZoneInfoTableViewCell.swift */; };
 		115276C42CCFFB7700B208EB /* CreateStripeCustomerResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115276C32CCFFB7700B208EB /* CreateStripeCustomerResponse.swift */; };
@@ -81,8 +77,6 @@
 		117C17C72CE5B8C90034594E /* VehicleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C17C62CE5B8A20034594E /* VehicleModel.swift */; };
 		117F63BD2D0EDE9100558A9F /* ReportSystemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117F63BC2D0EDE9100558A9F /* ReportSystemViewController.swift */; };
 		1184D6552CD7A29A001FB356 /* TopUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184D6542CD7A29A001FB356 /* TopUpViewController.swift */; };
-		1184D65D2CD803B4001FB356 /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1184D65C2CD803B4001FB356 /* TransactionTableViewCell.xib */; };
-		1184D65E2CD803B4001FB356 /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184D65B2CD803B4001FB356 /* TransactionTableViewCell.swift */; };
 		1184D6602CD817C2001FB356 /* TransactionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184D65F2CD817BC001FB356 /* TransactionData.swift */; };
 		118964992CD8374900D01275 /* TransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118964982CD8374300D01275 /* TransactionModel.swift */; };
 		1189649B2CD8B93C00D01275 /* ProfileManagementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1189649A2CD8B93C00D01275 /* ProfileManagementViewController.swift */; };
@@ -106,14 +100,6 @@
 		11A5AD982CED3AFA00774D00 /* ParkingSessionSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5AD972CED3AFA00774D00 /* ParkingSessionSuccessViewController.swift */; };
 		11A734842CBF7F0600664016 /* EmailStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A734832CBF7EFF00664016 /* EmailStatus.swift */; };
 		11A734862CBFC2AE00664016 /* FloatingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A734852CBFC2AE00664016 /* FloatingViewController.swift */; };
-		11A828F42CCCFA9A0007C642 /* Stripe in Frameworks */ = {isa = PBXBuildFile; productRef = 11A828F32CCCFA9A0007C642 /* Stripe */; };
-		11A828F62CCCFA9A0007C642 /* StripeApplePay in Frameworks */ = {isa = PBXBuildFile; productRef = 11A828F52CCCFA9A0007C642 /* StripeApplePay */; };
-		11A828F82CCCFA9A0007C642 /* StripeCardScan in Frameworks */ = {isa = PBXBuildFile; productRef = 11A828F72CCCFA9A0007C642 /* StripeCardScan */; };
-		11A828FA2CCCFA9A0007C642 /* StripeFinancialConnections in Frameworks */ = {isa = PBXBuildFile; productRef = 11A828F92CCCFA9A0007C642 /* StripeFinancialConnections */; };
-		11A828FC2CCCFA9A0007C642 /* StripeIdentity in Frameworks */ = {isa = PBXBuildFile; productRef = 11A828FB2CCCFA9A0007C642 /* StripeIdentity */; };
-		11A828FE2CCCFA9A0007C642 /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 11A828FD2CCCFA9A0007C642 /* StripePaymentSheet */; };
-		11A829002CCCFA9A0007C642 /* StripePayments in Frameworks */ = {isa = PBXBuildFile; productRef = 11A828FF2CCCFA9A0007C642 /* StripePayments */; };
-		11A829022CCCFA9A0007C642 /* StripePaymentsUI in Frameworks */ = {isa = PBXBuildFile; productRef = 11A829012CCCFA9A0007C642 /* StripePaymentsUI */; };
 		11A829042CCCFD460007C642 /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A829032CCCFD460007C642 /* ProgressViewController.swift */; };
 		11B044C82CC23C2400B14E38 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B044C72CC23C2400B14E38 /* ResetPasswordViewController.swift */; };
 		11BA43382CE1062D00A8E48B /* AreaListTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11BA43372CE1062D00A8E48B /* AreaListTableViewCell.xib */; };
@@ -137,6 +123,19 @@
 		11E86E962CC5B45700A54A46 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E86E952CC5B45700A54A46 /* InfoView.swift */; };
 		11F0B8552CD1398600EC9D91 /* PaymentIntentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F0B8542CD1398600EC9D91 /* PaymentIntentRequest.swift */; };
 		11F0B8572CD164C600EC9D91 /* PaymentSheetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F0B8562CD164C500EC9D91 /* PaymentSheetRequest.swift */; };
+		11F941482D143198004EA201 /* Stripe in Frameworks */ = {isa = PBXBuildFile; productRef = 11F941472D143198004EA201 /* Stripe */; };
+		11F9414A2D143198004EA201 /* StripeApplePay in Frameworks */ = {isa = PBXBuildFile; productRef = 11F941492D143198004EA201 /* StripeApplePay */; };
+		11F9414C2D143198004EA201 /* StripeCardScan in Frameworks */ = {isa = PBXBuildFile; productRef = 11F9414B2D143198004EA201 /* StripeCardScan */; };
+		11F9414E2D143198004EA201 /* StripeConnect in Frameworks */ = {isa = PBXBuildFile; productRef = 11F9414D2D143198004EA201 /* StripeConnect */; };
+		11F941502D143198004EA201 /* StripeFinancialConnections in Frameworks */ = {isa = PBXBuildFile; productRef = 11F9414F2D143198004EA201 /* StripeFinancialConnections */; };
+		11F941532D143646004EA201 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 11F941522D143646004EA201 /* Auth */; };
+		11F941552D143646004EA201 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 11F941542D143646004EA201 /* Functions */; };
+		11F941572D143646004EA201 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 11F941562D143646004EA201 /* PostgREST */; };
+		11F941592D143646004EA201 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 11F941582D143646004EA201 /* Realtime */; };
+		11F9415B2D143646004EA201 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 11F9415A2D143646004EA201 /* Storage */; };
+		11F9415E2D14366D004EA201 /* FloatingPanel in Frameworks */ = {isa = PBXBuildFile; productRef = 11F9415D2D14366D004EA201 /* FloatingPanel */; };
+		11F941602D14770C004EA201 /* ParkingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F9415F2D14770C004EA201 /* ParkingTableViewCell.swift */; };
+		11F941622D1477EF004EA201 /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F941612D1477EF004EA201 /* TransactionTableViewCell.swift */; };
 		11FD5E7A2CC67B8A00E5530D /* ParkingSpotInfoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11FD5E792CC67B8A00E5530D /* ParkingSpotInfoCell.xib */; };
 		11FD5E7B2CC67B8A00E5530D /* ParkingSpotInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FD5E782CC67B8A00E5530D /* ParkingSpotInfoCell.swift */; };
 /* End PBXBuildFile section */
@@ -204,8 +203,6 @@
 		114BA31F2C9E0DB900009B31 /* UserLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocation.swift; sourceTree = "<group>"; };
 		114BA3282C9E1FA500009B31 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		114BA3292C9E1FA500009B31 /* TableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
-		114BA32E2C9F2A3200009B31 /* ParkingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingTableViewCell.swift; sourceTree = "<group>"; };
-		114BA32F2C9F2A3200009B31 /* ParkingTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ParkingTableViewCell.xib; sourceTree = "<group>"; };
 		115187252CE9407900B21AC4 /* ParkingSpotDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingSpotDetailsViewController.swift; sourceTree = "<group>"; };
 		1151872B2CEA008000B21AC4 /* ZoneInfoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneInfoTableViewCell.swift; sourceTree = "<group>"; };
 		115276C32CCFFB7700B208EB /* CreateStripeCustomerResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateStripeCustomerResponse.swift; sourceTree = "<group>"; };
@@ -230,8 +227,6 @@
 		117C17C62CE5B8A20034594E /* VehicleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleModel.swift; sourceTree = "<group>"; };
 		117F63BC2D0EDE9100558A9F /* ReportSystemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSystemViewController.swift; sourceTree = "<group>"; };
 		1184D6542CD7A29A001FB356 /* TopUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopUpViewController.swift; sourceTree = "<group>"; };
-		1184D65B2CD803B4001FB356 /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
-		1184D65C2CD803B4001FB356 /* TransactionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionTableViewCell.xib; sourceTree = "<group>"; };
 		1184D65F2CD817BC001FB356 /* TransactionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionData.swift; sourceTree = "<group>"; };
 		118964982CD8374300D01275 /* TransactionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionModel.swift; sourceTree = "<group>"; };
 		1189649A2CD8B93C00D01275 /* ProfileManagementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManagementViewController.swift; sourceTree = "<group>"; };
@@ -278,6 +273,8 @@
 		11E86E952CC5B45700A54A46 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		11F0B8542CD1398600EC9D91 /* PaymentIntentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentIntentRequest.swift; sourceTree = "<group>"; };
 		11F0B8562CD164C500EC9D91 /* PaymentSheetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSheetRequest.swift; sourceTree = "<group>"; };
+		11F9415F2D14770C004EA201 /* ParkingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingTableViewCell.swift; sourceTree = "<group>"; };
+		11F941612D1477EF004EA201 /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
 		11FD5E782CC67B8A00E5530D /* ParkingSpotInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingSpotInfoCell.swift; sourceTree = "<group>"; };
 		11FD5E792CC67B8A00E5530D /* ParkingSpotInfoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ParkingSpotInfoCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -287,21 +284,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				113B113A2CAC96270042D5F2 /* Supabase in Frameworks */,
-				11A828FE2CCCFA9A0007C642 /* StripePaymentSheet in Frameworks */,
-				113B11382CAC96270042D5F2 /* Storage in Frameworks */,
-				11A829022CCCFA9A0007C642 /* StripePaymentsUI in Frameworks */,
-				113B11342CAC96270042D5F2 /* PostgREST in Frameworks */,
-				11A828FC2CCCFA9A0007C642 /* StripeIdentity in Frameworks */,
-				11A828FA2CCCFA9A0007C642 /* StripeFinancialConnections in Frameworks */,
-				11A828F62CCCFA9A0007C642 /* StripeApplePay in Frameworks */,
-				113B11322CAC96270042D5F2 /* Functions in Frameworks */,
-				113B11302CAC96270042D5F2 /* Auth in Frameworks */,
-				11A828F42CCCFA9A0007C642 /* Stripe in Frameworks */,
-				113B11362CAC96270042D5F2 /* Realtime in Frameworks */,
-				11A828F82CCCFA9A0007C642 /* StripeCardScan in Frameworks */,
-				11A829002CCCFA9A0007C642 /* StripePayments in Frameworks */,
-				114BA3172C9DE15200009B31 /* FloatingPanel in Frameworks */,
+				110BB09A2D153E600050C718 /* StripePayments in Frameworks */,
+				11F941592D143646004EA201 /* Realtime in Frameworks */,
+				11F941502D143198004EA201 /* StripeFinancialConnections in Frameworks */,
+				11F9414C2D143198004EA201 /* StripeCardScan in Frameworks */,
+				11F941532D143646004EA201 /* Auth in Frameworks */,
+				110BB0982D153E600050C718 /* StripePaymentSheet in Frameworks */,
+				110BB09C2D153E600050C718 /* StripePaymentsUI in Frameworks */,
+				11F9415E2D14366D004EA201 /* FloatingPanel in Frameworks */,
+				11F941482D143198004EA201 /* Stripe in Frameworks */,
+				11F941572D143646004EA201 /* PostgREST in Frameworks */,
+				11F941552D143646004EA201 /* Functions in Frameworks */,
+				110BB0962D153E600050C718 /* StripeIdentity in Frameworks */,
+				110BB0942D153E460050C718 /* Supabase in Frameworks */,
+				11F9414E2D143198004EA201 /* StripeConnect in Frameworks */,
+				11F9415B2D143646004EA201 /* Storage in Frameworks */,
+				11F9414A2D143198004EA201 /* StripeApplePay in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +360,7 @@
 				114BA2A32C9ADA5400009B31 /* Map(1.0) */,
 				114BA2BA2C9ADA5600009B31 /* Map(1.0)Tests */,
 				114BA2C42C9ADA5600009B31 /* Map(1.0)UITests */,
+				11F941452D14305F004EA201 /* Frameworks */,
 				114BA2A22C9ADA5400009B31 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -427,14 +426,13 @@
 		114BA3122C9B507700009B31 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				11F9415F2D14770C004EA201 /* ParkingTableViewCell.swift */,
 				11499BEE2CDFE029006D7245 /* ParkingFinderTableViewCell.xib */,
 				11499BED2CDFE029006D7245 /* ParkingFinderTableViewCell.swift */,
 				11E86E952CC5B45700A54A46 /* InfoView.swift */,
 				114BA3132C9DDB9E00009B31 /* InfomationPanel.swift */,
 				114BA3282C9E1FA500009B31 /* TableViewCell.swift */,
 				114BA3292C9E1FA500009B31 /* TableViewCell.xib */,
-				114BA32E2C9F2A3200009B31 /* ParkingTableViewCell.swift */,
-				114BA32F2C9F2A3200009B31 /* ParkingTableViewCell.xib */,
 				113B112C2CA8CC8F0042D5F2 /* ParkingInformationPanel.swift */,
 				11FD5E782CC67B8A00E5530D /* ParkingSpotInfoCell.swift */,
 				11FD5E792CC67B8A00E5530D /* ParkingSpotInfoCell.xib */,
@@ -630,8 +628,6 @@
 			children = (
 				1184D6562CD7A2A8001FB356 /* Controller */,
 				11C23F2A2CD12ABE0094341D /* Model */,
-				1184D65B2CD803B4001FB356 /* TransactionTableViewCell.swift */,
-				1184D65C2CD803B4001FB356 /* TransactionTableViewCell.xib */,
 			);
 			path = Payment;
 			sourceTree = "<group>";
@@ -639,6 +635,7 @@
 		11C23F2A2CD12ABE0094341D /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				11F941612D1477EF004EA201 /* TransactionTableViewCell.swift */,
 				118964982CD8374300D01275 /* TransactionModel.swift */,
 				1184D65F2CD817BC001FB356 /* TransactionData.swift */,
 				110129402CD6128300CD6B4C /* WalletData.swift */,
@@ -673,6 +670,13 @@
 			path = Support;
 			sourceTree = "<group>";
 		};
+		11F941452D14305F004EA201 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -690,21 +694,22 @@
 			);
 			name = "Map(1.0)";
 			packageProductDependencies = (
-				114BA3162C9DE15200009B31 /* FloatingPanel */,
-				113B112F2CAC96270042D5F2 /* Auth */,
-				113B11312CAC96270042D5F2 /* Functions */,
-				113B11332CAC96270042D5F2 /* PostgREST */,
-				113B11352CAC96270042D5F2 /* Realtime */,
-				113B11372CAC96270042D5F2 /* Storage */,
-				113B11392CAC96270042D5F2 /* Supabase */,
-				11A828F32CCCFA9A0007C642 /* Stripe */,
-				11A828F52CCCFA9A0007C642 /* StripeApplePay */,
-				11A828F72CCCFA9A0007C642 /* StripeCardScan */,
-				11A828F92CCCFA9A0007C642 /* StripeFinancialConnections */,
-				11A828FB2CCCFA9A0007C642 /* StripeIdentity */,
-				11A828FD2CCCFA9A0007C642 /* StripePaymentSheet */,
-				11A828FF2CCCFA9A0007C642 /* StripePayments */,
-				11A829012CCCFA9A0007C642 /* StripePaymentsUI */,
+				11F941472D143198004EA201 /* Stripe */,
+				11F941492D143198004EA201 /* StripeApplePay */,
+				11F9414B2D143198004EA201 /* StripeCardScan */,
+				11F9414D2D143198004EA201 /* StripeConnect */,
+				11F9414F2D143198004EA201 /* StripeFinancialConnections */,
+				11F941522D143646004EA201 /* Auth */,
+				11F941542D143646004EA201 /* Functions */,
+				11F941562D143646004EA201 /* PostgREST */,
+				11F941582D143646004EA201 /* Realtime */,
+				11F9415A2D143646004EA201 /* Storage */,
+				11F9415D2D14366D004EA201 /* FloatingPanel */,
+				110BB0932D153E460050C718 /* Supabase */,
+				110BB0952D153E600050C718 /* StripeIdentity */,
+				110BB0972D153E600050C718 /* StripePaymentSheet */,
+				110BB0992D153E600050C718 /* StripePayments */,
+				110BB09B2D153E600050C718 /* StripePaymentsUI */,
 			);
 			productName = "Map(1.0)";
 			productReference = 114BA2A12C9ADA5400009B31 /* Map(1.0).app */;
@@ -779,9 +784,9 @@
 			);
 			mainGroup = 114BA2982C9ADA5400009B31;
 			packageReferences = (
-				114BA3152C9DE15200009B31 /* XCRemoteSwiftPackageReference "FloatingPanel" */,
-				113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */,
-				11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */,
+				11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */,
+				11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				11F9415C2D14366D004EA201 /* XCRemoteSwiftPackageReference "FloatingPanel" */,
 			);
 			productRefGroup = 114BA2A22C9ADA5400009B31 /* Products */;
 			projectDirPath = "";
@@ -800,11 +805,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				11499BF02CDFE029006D7245 /* ParkingFinderTableViewCell.xib in Resources */,
-				114BA3302C9F2A3200009B31 /* ParkingTableViewCell.xib in Resources */,
 				11FD5E7A2CC67B8A00E5530D /* ParkingSpotInfoCell.xib in Resources */,
 				114BA2AE2C9ADA5600009B31 /* Assets.xcassets in Resources */,
 				11451E432CC6EC8D00564D51 /* AreaDetailTableViewCell.xib in Resources */,
-				1184D65D2CD803B4001FB356 /* TransactionTableViewCell.xib in Resources */,
 				114BA32A2C9E1FA500009B31 /* TableViewCell.xib in Resources */,
 				11BA43382CE1062D00A8E48B /* AreaListTableViewCell.xib in Resources */,
 				114BA2B12C9ADA5600009B31 /* Base in Resources */,
@@ -854,12 +857,10 @@
 				117F63BD2D0EDE9100558A9F /* ReportSystemViewController.swift in Sources */,
 				1151872C2CEA008000B21AC4 /* ZoneInfoTableViewCell.swift in Sources */,
 				114BA31C2C9E0B6B00009B31 /* AreaModel.swift in Sources */,
-				114BA3312C9F2A3200009B31 /* ParkingTableViewCell.swift in Sources */,
 				11158FC72CE176D9006F7255 /* AvailableParkingData.swift in Sources */,
 				11158FC52CE17667006F7255 /* AvailableParkingSpotModel.swift in Sources */,
 				11A5AD902CEBDE2700774D00 /* ParkingCostResponse.swift in Sources */,
 				113B113E2CAD66F00042D5F2 /* StreetModel.swift in Sources */,
-				1184D65E2CD803B4001FB356 /* TransactionTableViewCell.swift in Sources */,
 				11D589442CAF379A001A10BE /* ParkingSpotModel.swift in Sources */,
 				113B11462CAF33530042D5F2 /* ParkingSpotData.swift in Sources */,
 				11499BEF2CDFE029006D7245 /* ParkingFinderTableViewCell.swift in Sources */,
@@ -931,10 +932,12 @@
 				11779A022D12FCF0008F6889 /* ParkingHistoryCell.swift in Sources */,
 				11D589462CB1BF5D001A10BE /* StreetData.swift in Sources */,
 				114BA2A72C9ADA5400009B31 /* SceneDelegate.swift in Sources */,
+				11F941622D1477EF004EA201 /* TransactionTableViewCell.swift in Sources */,
 				113B11442CADBFCB0042D5F2 /* AreaData.swift in Sources */,
 				11E5FB292CDA9132005B5D0B /* AuthStateListener.swift in Sources */,
 				11499BE22CDFAFC8006D7245 /* SearchTableViewController.swift in Sources */,
 				113AE62D2CC9908100F785C8 /* FilterButton.swift in Sources */,
+				11F941602D14770C004EA201 /* ParkingTableViewCell.swift in Sources */,
 				113B11422CAD9DEA0042D5F2 /* SupabaseManager.swift in Sources */,
 				11779A0A2D134A69008F6889 /* ParkingSessionManager.swift in Sources */,
 			);
@@ -1283,7 +1286,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stripe/stripe-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 24.2.0;
+			};
+		};
+		11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift.git";
 			requirement = {
@@ -1291,7 +1302,7 @@
 				minimumVersion = 2.5.1;
 			};
 		};
-		114BA3152C9DE15200009B31 /* XCRemoteSwiftPackageReference "FloatingPanel" */ = {
+		11F9415C2D14366D004EA201 /* XCRemoteSwiftPackageReference "FloatingPanel" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scenee/FloatingPanel";
 			requirement = {
@@ -1299,91 +1310,88 @@
 				minimumVersion = 2.8.6;
 			};
 		};
-		11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/stripe/stripe-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 23.32.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		113B112F2CAC96270042D5F2 /* Auth */ = {
+		110BB0932D153E460050C718 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
-		};
-		113B11312CAC96270042D5F2 /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Functions;
-		};
-		113B11332CAC96270042D5F2 /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
-		};
-		113B11352CAC96270042D5F2 /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Realtime;
-		};
-		113B11372CAC96270042D5F2 /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Storage;
-		};
-		113B11392CAC96270042D5F2 /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 113B112E2CAC96270042D5F2 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
-		114BA3162C9DE15200009B31 /* FloatingPanel */ = {
+		110BB0952D153E600050C718 /* StripeIdentity */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 114BA3152C9DE15200009B31 /* XCRemoteSwiftPackageReference "FloatingPanel" */;
-			productName = FloatingPanel;
-		};
-		11A828F32CCCFA9A0007C642 /* Stripe */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
-			productName = Stripe;
-		};
-		11A828F52CCCFA9A0007C642 /* StripeApplePay */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
-			productName = StripeApplePay;
-		};
-		11A828F72CCCFA9A0007C642 /* StripeCardScan */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
-			productName = StripeCardScan;
-		};
-		11A828F92CCCFA9A0007C642 /* StripeFinancialConnections */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
-			productName = StripeFinancialConnections;
-		};
-		11A828FB2CCCFA9A0007C642 /* StripeIdentity */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
 			productName = StripeIdentity;
 		};
-		11A828FD2CCCFA9A0007C642 /* StripePaymentSheet */ = {
+		110BB0972D153E600050C718 /* StripePaymentSheet */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
 			productName = StripePaymentSheet;
 		};
-		11A828FF2CCCFA9A0007C642 /* StripePayments */ = {
+		110BB0992D153E600050C718 /* StripePayments */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
 			productName = StripePayments;
 		};
-		11A829012CCCFA9A0007C642 /* StripePaymentsUI */ = {
+		110BB09B2D153E600050C718 /* StripePaymentsUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 11A828F22CCCFA9A0007C642 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
 			productName = StripePaymentsUI;
+		};
+		11F941472D143198004EA201 /* Stripe */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			productName = Stripe;
+		};
+		11F941492D143198004EA201 /* StripeApplePay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			productName = StripeApplePay;
+		};
+		11F9414B2D143198004EA201 /* StripeCardScan */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			productName = StripeCardScan;
+		};
+		11F9414D2D143198004EA201 /* StripeConnect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			productName = StripeConnect;
+		};
+		11F9414F2D143198004EA201 /* StripeFinancialConnections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941462D143198004EA201 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			productName = StripeFinancialConnections;
+		};
+		11F941522D143646004EA201 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		11F941542D143646004EA201 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		11F941562D143646004EA201 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		11F941582D143646004EA201 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		11F9415A2D143646004EA201 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F941512D143646004EA201 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		11F9415D2D14366D004EA201 /* FloatingPanel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11F9415C2D14366D004EA201 /* XCRemoteSwiftPackageReference "FloatingPanel" */;
+			productName = FloatingPanel;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

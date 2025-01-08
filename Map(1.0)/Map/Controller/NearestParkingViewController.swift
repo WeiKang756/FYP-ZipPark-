@@ -1,3 +1,4 @@
+
 import UIKit
 
 
@@ -32,10 +33,10 @@ class NearestParkingViewController: UIViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(UINib(nibName: "ParkingTableViewCell", bundle: nil), forCellReuseIdentifier: "ParkingCell")
+        tableView.register(ParkingTableViewCell.self, forCellReuseIdentifier: "ParkingCell")
         return tableView
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -66,16 +67,6 @@ class NearestParkingViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
         delegate?.didDismissViewController()
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 }
 
 extension NearestParkingViewController: UITableViewDataSource {
@@ -132,5 +123,4 @@ extension NearestParkingViewController: UITableViewDelegate {
         delegate?.didSelectedNearestParking(selectedParkingSpot)
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    
 }

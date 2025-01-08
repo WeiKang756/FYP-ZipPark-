@@ -7,17 +7,21 @@
 
 import UIKit
 
+
 protocol ParkingFinderTableViewCellDelegate: AnyObject {
     func nearestParkingButtonDidPress()
     func evParkingButtonDidPress()
     func disableParkingButtonDidPress()
 }
+
 class ParkingFinderTableViewCell: UITableViewCell {
 
     @IBOutlet weak var nearestParkingButton: UIButton!
     @IBOutlet weak var evParkingButton: UIButton!
     @IBOutlet weak var disableParkingButton: UIButton!
+
     var delegate: ParkingFinderTableViewCellDelegate?
+
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -40,10 +44,12 @@ class ParkingFinderTableViewCell: UITableViewCell {
                 self.nearestParkingButton.transform = CGAffineTransform.identity // Reset to original size
             }
         }
+
         
         if let delegate = delegate {
             delegate.nearestParkingButtonDidPress()
         }
+
         print("nearestParkingButtonPressed")
     }
     
@@ -61,7 +67,7 @@ class ParkingFinderTableViewCell: UITableViewCell {
         if let delegate = delegate {
             delegate.evParkingButtonDidPress()
         }
-        
+
         print("evParkingButtonPressed")
     }
     

@@ -12,4 +12,6 @@ struct AreaData: Decodable {
     let areaName: String
     let latitude: Double
     let longitude: Double
+    let availableParking: Int?
+    let totalParking: Int?
 }

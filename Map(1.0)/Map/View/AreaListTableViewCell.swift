@@ -8,10 +8,11 @@
 import UIKit
 
 class AreaListTableViewCell: UITableViewCell {
+
     @IBOutlet weak var areaName: UILabel!
     @IBOutlet weak var distanceLabel: UILabel!
     @IBOutlet weak var availableLabel: UILabel!
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

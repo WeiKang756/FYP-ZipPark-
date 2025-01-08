@@ -1,10 +1,3 @@
-//
-//  PaymentManager.swift
-//  Map(1.0)
-//
-//  Created by Wei Kang Tan on 29/10/2024.
-//
-
 import Foundation
 import Functions
 
@@ -23,37 +16,46 @@ extension PaymentManagerDelegate {
     }
 }
 
-class PaymentManager{
+class PaymentManager {
     
     static let shared = PaymentManager()
     private let supabase = SupabaseManager.shared.client
     var delegate: PaymentManagerDelegate?
     
     func createPaymentIntent(amount: Double) {
-        Task{
-            do{
+        Task {
+            do {
+                // Get user and validate
                 let user = await SupabaseManager.shared.getUser()
-                
                 guard let user = user else {
-                    print("Fail to get user information")
+                    print("Failed to get user information")
                     return
                 }
-                print(user)
+                print("User:", user)
                 
+                // Get customer ID
                 guard let customerId = user.userMetadata["stripeCustomerId"]?.stringValue else {
-                    print("Fail to get user stripe customer Id")
+                    print("Failed to get user stripe customer ID")
                     return
                 }
-                print(customerId)
+                print("Customer ID:", customerId)
                 
+                // Get wallet
                 guard let wallet = await getWallet() else {
-                    print("Fail to get user id")
+                    print("Failed to get wallet")
                     return
                 }
-                print(wallet)
+                print("Wallet:", wallet)
                 
-                let paymentIntentRequest = PaymentIntentRequest(amount: amount, currency: "myr", customerId: customerId, walletId: wallet.id)
+                // Create payment intent request
+                let paymentIntentRequest = PaymentIntentRequest(
+                    amount: amount,
+                    currency: "myr",
+                    customerId: customerId,
+                    walletId: wallet.id
+                )
                 
+                // Make API call
                 let response: PaymentIntentResponse = try await supabase.functions
                     .invoke(
                         "create-payment-intent",
@@ -62,19 +64,25 @@ class PaymentManager{
                         )
                     )
                 
-                let paymentSheetRequest = PaymentSheetRequest(clientSecret: response.clientSecret, ephemeralKeySecret: response.ephemeralKeySecret, customerId: customerId)
+                // Create payment sheet request
+                let paymentSheetRequest = PaymentSheetRequest(
+                    clientSecret: response.clientSecret,
+                    ephemeralKeySecret: response.ephemeralKeySecret,
+                    customerId: customerId
+                )
                 
+                // Notify delegate
                 delegate?.paymentIntentDidCreate(paymentSheetRequest)
-            }catch {
-                print("error: \(error.localizedDescription)")
+            } catch {
+                print("Error creating payment intent:", error.localizedDescription)
             }
         }
     }
     
     func getWallet() async -> WalletData? {
-        do{
+        do {
             guard let user = await SupabaseManager.shared.getUser() else {
-                print("Fail to get user object")
+                print("Failed to get user object")
                 return nil
             }
             
@@ -88,33 +96,32 @@ class PaymentManager{
                 .value
             
             return wallet
-        }catch {
-            print(error.localizedDescription)
+        } catch {
+            print("Error getting wallet:", error.localizedDescription)
             return nil
         }
     }
     
     func fetchTransaction() {
-        Task{
-            do{
+        Task {
+            do {
                 guard let wallet = await getWallet() else {
-                    print("Fail to get user wallet object")
+                    print("Failed to get user wallet object")
                     return
                 }
+                
                 let walletId = wallet.id
                 let transactionData: [TransactionData] = try await supabase
                     .from("transactions")
-                    .select(
-                    """
+                    .select("""
                       id,
                       wallet_id,
                       amount,
                       reference_id,
                       transaction_date,
                       transaction_types(name)
-                    """
-                    )
-                    .eq("wallet_id", value: walletId) // Add filter to find by wallet_id'
+                    """)
+                    .eq("wallet_id", value: walletId)
                     .order("transaction_date", ascending: false)
                     .execute()
                     .value
@@ -122,55 +129,52 @@ class PaymentManager{
                 var transactionModels: [TransactionModel] = []
                 
                 for transaction in transactionData {
-                    let id = transaction.id
-                    let amount = transaction.amount
-                    let reference = transaction.referenceId
-                    guard let formattedDateString = formatDateString(transaction.transactionDate) else {
-                        return
+                    guard let formattedDate = formatDateString(transaction.transactionDate) else {
+                        continue
                     }
-                    let date = formattedDateString.date
-                    let time = formattedDateString.time
-                    let type = transaction.transactionType.name
-                    let transactionModel = TransactionModel(id: id, amount: amount, reference: reference, date: date, time: time, type: type)
+                    
+                    let transactionModel = TransactionModel(
+                        id: transaction.id,
+                        amount: transaction.amount,
+                        reference: transaction.referenceId,
+                        date: formattedDate.date,
+                        time: formattedDate.time,
+                        type: transaction.transactionType.name
+                    )
                     transactionModels.append(transactionModel)
                 }
                 
                 if transactionModels.isEmpty {
-                    print("Fail to get transaction model")
-                }else {
+                    print("No transactions found")
+                } else {
                     delegate?.transactionDidFetch(transactionModels)
                 }
-            }catch {
-                print(error.localizedDescription)
+            } catch {
+                print("Error fetching transactions:", error.localizedDescription)
             }
         }
     }
     
     func formatDateString(_ dateString: String) -> (date: String, time: String)? {
-        // Define the date formatter for the input string
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         
-        // Parse the date string
         guard let date = formatter.date(from: dateString) else {
+            print("Failed to parse date string:", dateString)
             return nil
         }
         
-        // Create a new date formatter for displaying the date and time
         let displayFormatter = DateFormatter()
         displayFormatter.timeZone = TimeZone.current
         
-        // Format the date part
         displayFormatter.dateStyle = .medium
         displayFormatter.timeStyle = .none
         let formattedDate = displayFormatter.string(from: date)
         
-        // Format the time part
         displayFormatter.dateStyle = .none
         displayFormatter.timeStyle = .short
         let formattedTime = displayFormatter.string(from: date)
         
         return (date: formattedDate, time: formattedTime)
     }
-    
 }

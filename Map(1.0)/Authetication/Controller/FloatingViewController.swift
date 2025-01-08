@@ -12,6 +12,7 @@ protocol FloatingViewControllerDelegate: AnyObject {
     func didPressSignInWithOTPButton()
     func didPressResetPasswordButton()
 }
+
 class FloatingViewController: UIViewController {
     
     var delegate: FloatingViewControllerDelegate?

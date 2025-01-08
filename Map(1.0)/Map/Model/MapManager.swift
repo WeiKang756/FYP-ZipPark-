@@ -1,80 +1,77 @@
-//
-//  MapManager.swift
-//  Map(1.0)
-//
-//  Created by Wei Kang Tan on 02/10/2024.
-//
-
 import Foundation
 import CoreLocation
+import Supabase
 
+// MARK: - Protocols
 protocol MapManagerDelegate: AnyObject {
     func didFetchAreaData(_ areasModel: [AreaModel])
     func didFetchStreetAndParkingSpotData(_ streetsModel: [StreetModel])
     func didFetchParkingSpotData(_ parkingSpotModel: [ParkingSpotModel])
 }
 
+// MARK: - Default Protocol Implementation
 extension MapManagerDelegate {
     func didFetchAreaData(_ areasModel: [AreaModel]) {
-        print("did fetch area data")
+        print("Did fetch area data")
     }
     
     func didFetchStreetAndParkingSpotData(_ streetsModel: [StreetModel]) {
-        print("did fetch street data")
+        print("Did fetch street data")
     }
     
-    func didFetchParkingSpotData(_ parkingSpotModel: [ParkingSpotModel]){
-        print("did fetch parking spot data")
+    func didFetchParkingSpotData(_ parkingSpotModel: [ParkingSpotModel]) {
+        print("Did fetch parking spot data")
     }
 }
 
+// MARK: - Error Types
+enum MapManagerError: Error {
+    case userLocationNotAvailable
+    case parkingDataFetchFailed(areaID: Int)
+    case streetDataFetchFailed(streetID: Int)
+    case invalidData
+}
+
+// MARK: - MapManager Implementation
 struct MapManager {
+    // MARK: - Properties
     private let supabase = SupabaseManager.shared.client
-    
     weak var delegate: MapManagerDelegate?
     var userLocation: UserLocation?
     
+    // MARK: - Public Methods
     func fetchAreaData() {
         Task {
             do {
+                guard let userLocation = userLocation else {
+                    print("Error: User location not available")
+                    return
+                }
+                
                 let areasData: [AreaData] = try await supabase
                     .from("Area")
                     .select()
                     .execute()
                     .value
+                
                 var areasModel: [AreaModel] = []
                 
-                guard let userLocation = userLocation else {
-                    print("Fail to get user location")
-                    return
-                }
-                
                 for areaData in areasData {
-                    let areaID = areaData.areaID
-                    let areaName = areaData.areaName
-                    let latitude = areaData.latitude
-                    let longitude = areaData.longitude
-                    let areaLocation = CLLocation(latitude: latitude, longitude: longitude)
-                    
-                    // Calculate the distance between user and area
+                    let areaLocation = CLLocation(latitude: areaData.latitude, longitude: areaData.longitude)
                     let distance = calculateDistance(userLocation.location, areaLocation)
                     
-                    guard let parkingSpotArray = await fetchParkingSpotArray(areaID: areaID) else {
-                        print("Error Fetching Parking Spot Array (total parking & available Parking")
-                        return
+                    guard let parkingSpotArray = await fetchParkingSpotArray(areaID: areaData.areaID) else {
+                        print("Error: Unable to fetch parking data for area \(areaData.areaID)")
+                        continue
                     }
                     
-                    let totalParking = parkingSpotArray.totalParking
-                    let availableParking = parkingSpotArray.availableParking
-                    
-                    // Create the area model with the calculated distance
                     let areaModel = AreaModel(
-                        areaID: areaID,
-                        areaName: areaName,
-                        latitude: latitude,
-                        longtitude: longitude,
-                        totalParking: totalParking,
-                        availableParking: availableParking,
+                        areaID: areaData.areaID,
+                        areaName: areaData.areaName,
+                        latitude: areaData.latitude,
+                        longtitude: areaData.longitude,
+                        totalParking: parkingSpotArray.totalParking,
+                        availableParking: parkingSpotArray.availableParking,
                         numGreen: parkingSpotArray.numGreen,
                         numYellow: parkingSpotArray.numYellow,
                         numRed: parkingSpotArray.numRed,
@@ -85,48 +82,12 @@ struct MapManager {
                     areasModel.append(areaModel)
                 }
                 
-                // Sort areasModel by distance
-                areasModel.sort { $0.distance ?? 0 < $1.distance ?? 0 }
-                
-                // Notify the delegate with the sorted data
+                areasModel.sort { $0.distance ?? Double.infinity < $1.distance ?? Double.infinity }
                 delegate?.didFetchAreaData(areasModel)
                 
             } catch {
-                print("Error fetching data: \(error.localizedDescription)")
+                print("Error fetching area data: \(error.localizedDescription)")
             }
-        }
-    }
-    
-    
-    func fetchParkingSpotArray(areaID: Int) async -> ParkingSpotArray? {
-        do {
-            let parkingSpotArray: ParkingSpotArray = try await supabase
-                .rpc("get_area_parking_info", params: ["area_id": areaID])
-                .execute()
-                .value
-            
-            print(parkingSpotArray)
-            
-            return parkingSpotArray
-        }catch {
-            print(error.localizedDescription)
-            return nil
-        }
-    }
-    
-    func fetchStreetInfo(streetID: Int) async -> StreetInfoData? {
-        do {
-            let streetInfoData: StreetInfoData = try await supabase
-                .rpc("get_available_parking_count_by_type_street", params: ["street_id": streetID])
-                .execute()
-                .value
-            
-            print(streetInfoData)
-            
-            return streetInfoData
-        }catch {
-            print(error.localizedDescription)
-            return nil
         }
     }
     
@@ -140,38 +101,37 @@ struct MapManager {
                     .execute()
                     .value
                 
-                var streetsModel: [StreetModel] = []  // Initialize as an empty array
+                guard let userLocation = userLocation else {
+                    print("Error: User location not available")
+                    return
+                }
+                
+                var streetsModel: [StreetModel] = []
                 
                 for streetData in streetsData {
                     let streetID = streetData.streetID
                     
-                    // Fetch parking spots for the current street
                     let parkingSpotsData: [ParkingSpotData] = try await supabase
                         .from("ParkingSpot")
                         .select("""
-                                *, 
-                                Street!inner(
-                                    streetName,
-                                    Area!inner(
-                                        areaName
-                                    )
+                            *, 
+                            Street!inner(
+                                streetName,
+                                Area!inner(
+                                    areaName
                                 )
-                                """)
+                            )
+                        """)
                         .eq("streetID", value: streetID)
                         .execute()
                         .value
-                    
-                    
-                    guard let userLocation = userLocation else {
-                        print("dont get user location")
-                        return
-                    }
                     
                     var parkingSpotModels: [ParkingSpotModel] = []
                     
                     for parkingSpotData in parkingSpotsData {
                         let parkingLocation = CLLocation(latitude: parkingSpotData.latitude, longitude: parkingSpotData.longitude)
                         let distance = calculateDistance(userLocation.location, parkingLocation)
+                        
                         let parkingSpotModel = ParkingSpotModel(
                             parkingSpotID: parkingSpotData.parkingSpotID,
                             isAvailable: parkingSpotData.isAvailable,
@@ -183,15 +143,14 @@ struct MapManager {
                             distance: distance
                         )
                         
-                        print(parkingSpotModel)
                         parkingSpotModels.append(parkingSpotModel)
                     }
                     
                     guard let streetInfoData = await fetchStreetInfo(streetID: streetID) else {
-                        return
+                        print("Error: Unable to fetch street info for street \(streetID)")
+                        continue
                     }
                     
-                    // Create StreetModel and append to streetsModel
                     let streetModel = StreetModel(
                         streetID: streetData.streetID,
                         streetName: streetData.streetName,
@@ -207,12 +166,10 @@ struct MapManager {
                     streetsModel.append(streetModel)
                 }
                 
-                // Notify delegate with fetched data
-                if streetsModel.isEmpty {
-                    print("No data fetched for streets.")
-                } else {
-                    print(streetsModel)
+                if !streetsModel.isEmpty {
                     delegate?.didFetchStreetAndParkingSpotData(streetsModel)
+                } else {
+                    print("No street data available")
                 }
                 
             } catch {
@@ -224,71 +181,97 @@ struct MapManager {
     func fetchParkingSpotData() {
         Task {
             do {
-                // Fetch parking spot data including street and area relationships
                 guard let userLocation = userLocation else {
-                    print("user Location is nil")
+                    print("Error: User location not available")
                     return
                 }
                 
                 let parkingSpotsData: [ParkingSpotData] = try await supabase
                     .from("ParkingSpot")
                     .select("""
-                            *, 
-                            Street!inner(
-                                streetName,
-                                Area!inner(
-                                    areaName
-                                )
+                        *, 
+                        Street!inner(
+                            streetName,
+                            Area!inner(
+                                areaName
                             )
-                            """)
+                        )
+                    """)
                     .eq("isAvailable", value: true)
                     .execute()
                     .value
                 
                 var parkingSpotModels: [ParkingSpotModel] = []
+                
                 for parkingSpotData in parkingSpotsData {
                     let parkingLocation = CLLocation(latitude: parkingSpotData.latitude, longitude: parkingSpotData.longitude)
                     let distance = calculateDistance(userLocation.location, parkingLocation)
-                    let areaName = parkingSpotData.street.area.areaName
-                    let streetName = parkingSpotData.street.streetName
-                    let availableParking = ParkingSpotModel(
+                    
+                    let parkingSpotModel = ParkingSpotModel(
                         parkingSpotID: parkingSpotData.parkingSpotID,
                         isAvailable: parkingSpotData.isAvailable,
                         type: parkingSpotData.type,
                         latitude: parkingSpotData.latitude,
                         longitude: parkingSpotData.longitude,
-                        streetName: streetName,
-                        areaName: areaName,
+                        streetName: parkingSpotData.street.streetName,
+                        areaName: parkingSpotData.street.area.areaName,
                         distance: distance
                     )
-                    parkingSpotModels.append(availableParking)
+                    
+                    parkingSpotModels.append(parkingSpotModel)
                 }
-                parkingSpotModels.sort { $0.distance ?? 0.0 < $1.distance ?? 0.0 }
+                
+                parkingSpotModels.sort { $0.distance! < $1.distance! }
                 delegate?.didFetchParkingSpotData(parkingSpotModels)
-                print("Have fetch parking spot data")
                 
             } catch {
-                // Print the error if the query fails
                 print("Error fetching parking spot data: \(error.localizedDescription)")
             }
         }
     }
     
-    
-    func calculateDistance(_ depart: CLLocation, _ destination: CLLocation) -> CLLocationDistance {
-        let distance = depart.distance(from: destination)
-        return distance
+    // MARK: - Private Methods
+    private func fetchParkingSpotArray(areaID: Int) async -> ParkingSpotArray? {
+        do {
+            let parkingSpotArray: ParkingSpotArray = try await supabase
+                .rpc("get_area_parking_info", params: ["area_id": areaID])
+                .execute()
+                .value
+            return parkingSpotArray
+        } catch {
+            print("Error fetching parking spot array: \(error.localizedDescription)")
+            return nil
+        }
     }
     
-    func distanceToDistanceString(distance: Double) -> String{
+    private func fetchStreetInfo(streetID: Int) async -> StreetInfoData? {
+        do {
+            let streetInfoData: StreetInfoData = try await supabase
+                .rpc("get_available_parking_count_by_type_street", params: ["street_id": streetID])
+                .execute()
+                .value
+            return streetInfoData
+        } catch {
+            print("Error fetching street info: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    func calculateDistance(_ depart: CLLocation, _ destination: CLLocation) -> Double {
+        return depart.distance(from: destination)
+    }
+    
+    func distanceToDistanceString(distance: Double) -> String {
         var distance = distance
         let distanceString: String
-        if distance > 1000{
-            distance = distance/1000
+        
+        if distance > 1000 {
+            distance = distance / 1000
             distanceString = String(format: "%.1f KM", distance)
-        }else {
+        } else {
             distanceString = String(format: "%.0f M", distance)
         }
+        
         return distanceString
     }
 }

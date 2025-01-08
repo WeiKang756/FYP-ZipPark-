@@ -1,40 +1,202 @@
-//
-//  OTPViewController.swift
-//  Map(1.0)
-//
-//  Created by Wei Kang Tan on 10/10/2024.
-//
-
 import UIKit
 
 class OTPViewController: UIViewController {
+    // MARK: - Properties
     private var textFields: [UITextField] = []
     private let numberOfDigits = 6
-    private let verifyButton = UIButton()
-    var email: String? = ""
+    private var timer: Timer?
+    private var secondsRemaining = 60
+    var email: String?
     var verifyType: VerifyType?
-    var timer: Timer?
-    var secondsRemaining = 10
-    let button = UIButton()
-    let resendOTPButton = UIButton(type: .system)
-    let resultLabel = UILabel()
-    let imageView = UIImageView()
-
+    
+    // MARK: - UI Components
+    private let containerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "paperplane.fill")
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .black
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .systemGray
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let otpStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.distribution = .fillEqually
+        stack.spacing = 10
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
+    private let verifyButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Verify", for: .normal)
+        button.backgroundColor = .black
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        button.isEnabled = false
+        button.alpha = 0.5
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let resendButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitleColor(.systemGray, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.isEnabled = false
+        button.alpha = 0.5
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let resultLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textAlignment = .center
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        indicator.color = .white
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        setupUI()
+        setupTextFields()
+        setupActions()
         AuthManager.shared.delegate = self
-        setupLabel()
         startResendTimer()
+        updateTitles()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    // MARK: - Setup Methods
+    private func setupUI() {
+        view.backgroundColor = .white
         
-        AuthManager.shared.delegate = self
+        view.addSubview(containerView)
+        [imageView, titleLabel, subtitleLabel, otpStackView,
+         verifyButton, resendButton, resultLabel, loadingIndicator].forEach {
+            containerView.addSubview($0)
+        }
+        
+        setupConstraints()
     }
     
-    var labelString: String {
+    private func setupTextFields() {
+        for i in 0..<numberOfDigits {
+            let textField = createOTPTextField(tag: i)
+            otpStackView.addArrangedSubview(textField)
+            textFields.append(textField)
+        }
+        textFields.first?.becomeFirstResponder()
+    }
+    
+    private func createOTPTextField(tag: Int) -> UITextField {
+        let textField = UITextField()
+        textField.borderStyle = .none
+        textField.textAlignment = .center
+        textField.backgroundColor = .systemGray6
+        textField.layer.cornerRadius = 12
+        textField.keyboardType = .numberPad
+        textField.font = .systemFont(ofSize: 24, weight: .bold)
+        textField.delegate = self
+        textField.tag = tag
+        textField.addTarget(self, action: #selector(textFieldDidChange(_:)),
+                          for: .editingChanged)
+        return textField
+    }
+    
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            imageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 40),
+            imageView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            imageView.heightAnchor.constraint(equalToConstant: 80),
+            imageView.widthAnchor.constraint(equalToConstant: 80),
+            
+            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 24),
+            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
+            
+            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            subtitleLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            subtitleLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            
+            otpStackView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 40),
+            otpStackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            otpStackView.heightAnchor.constraint(equalToConstant: 50),
+            otpStackView.widthAnchor.constraint(equalToConstant: CGFloat(numberOfDigits * 45)),
+            
+            resultLabel.topAnchor.constraint(equalTo: otpStackView.bottomAnchor, constant: 16),
+            resultLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
+            resultLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
+            
+            verifyButton.bottomAnchor.constraint(equalTo: resendButton.topAnchor, constant: -16),
+            verifyButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
+            verifyButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
+            verifyButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            resendButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -40),
+            resendButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            
+            loadingIndicator.centerXAnchor.constraint(equalTo: verifyButton.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: verifyButton.centerYAnchor)
+        ])
+    }
+    
+    private func setupActions() {
+        verifyButton.addTarget(self, action: #selector(verifyButtonPressed), for: .touchUpInside)
+        resendButton.addTarget(self, action: #selector(resendOTPButtonPressed), for: .touchUpInside)
+    }
+    
+    private func updateTitles() {
+        titleLabel.text = getTitleForVerifyType()
+        if let email = email {
+            subtitleLabel.text = "Enter OTP sent to \(email)"
+        }
+    }
+    
+    private func getTitleForVerifyType() -> String {
         switch verifyType {
         case .signup:
             return "Enter OTP to Verify Your Email"
@@ -43,246 +205,170 @@ class OTPViewController: UIViewController {
         case .magiclink:
             return "Enter OTP to Login"
         case .none:
-            return "Error"
+            return "Verification Required"
         }
     }
     
-    private func setupLabel() {
-        imageView.image = UIImage(systemName: "paperplane.fill")
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(imageView)
-        
-        let label = UILabel()
-        label.text = labelString 
-        
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(label)
-        
-        let bodyLabel = UILabel()
-        bodyLabel.text = "Enter OTP sent to \(email!)"
-        bodyLabel.font = UIFont.systemFont(ofSize: 12, weight: .light)
-        bodyLabel.textAlignment = .center
-        bodyLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(bodyLabel)
-        
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        stackView.spacing = 10
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stackView)
-        
-        
-        button.setTitle("Verify", for: .normal)
-        button.backgroundColor = .black
-        button.tintColor = .white
-        button.layer.cornerRadius = 10
-        button.isEnabled = false
-        button.alpha = 0.5
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(verifyButtonPressed), for: .touchUpInside)
-        view.addSubview(button)
-        
-        resultLabel.font = UIFont.systemFont(ofSize: 12) // Set the font
-        resultLabel.translatesAutoresizingMaskIntoConstraints = false
-        resultLabel.isHidden = true
-        view.addSubview(resultLabel)
-        
-        resendOTPButton.setTitleColor(.systemGray, for: .normal)
-        resendOTPButton.addTarget(self, action: #selector(resendOTPButtonPressed), for: .touchUpInside)
-        resendOTPButton.isEnabled = false
-        resendOTPButton.alpha = 0.5
-        resendOTPButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(resendOTPButton)
-        
-        for i in 0..<numberOfDigits {
-            let textField = UITextField()
-            textField.borderStyle = .roundedRect
-            textField.textAlignment = .center
-            textField.layer.borderColor = UIColor.lightGray.cgColor
-            textField.layer.borderWidth = 3.0
-            textField.layer.cornerRadius = 12.0
-            textField.keyboardType = .numberPad
-            textField.font = UIFont.systemFont(ofSize: 24)
-            textField.delegate = self
-            textField.tag = i
-            textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-            stackView.addArrangedSubview(textField)
-            textFields.append(textField)
-        }
-
-        textFields.first?.becomeFirstResponder()
-
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: bodyLabel.bottomAnchor, constant: 30),
-            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageView.heightAnchor.constraint(equalToConstant: 80),
-            imageView.widthAnchor.constraint(equalToConstant: 80),
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            bodyLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            bodyLabel.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 10),
-            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 40),
-            stackView.heightAnchor.constraint(equalToConstant: 50),
-            stackView.widthAnchor.constraint(equalToConstant: CGFloat(numberOfDigits * 40)),
-            resultLabel.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 10),
-            resultLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            button.topAnchor.constraint(equalTo: resultLabel.bottomAnchor, constant: 30),
-            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            resendOTPButton.topAnchor.constraint(equalTo: button.bottomAnchor, constant: 20),
-            resendOTPButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        ])
+    // MARK: - Timer Methods
+    private func startResendTimer() {
+        timer?.invalidate()
+        secondsRemaining = 60
+        updateResendButtonTitle()
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self,
+                                   selector: #selector(updateResendTimer),
+                                   userInfo: nil, repeats: true)
     }
     
+    @objc private func updateResendTimer() {
+        secondsRemaining -= 1
+        if secondsRemaining > 0 {
+            updateResendButtonTitle()
+        } else {
+            enableResendButton()
+        }
+    }
+    
+    private func updateResendButtonTitle() {
+        UIView.performWithoutAnimation {
+            resendButton.setTitle("Resend in \(secondsRemaining)s", for: .normal)
+            resendButton.layoutIfNeeded()
+        }
+    }
+    
+    private func enableResendButton() {
+        timer?.invalidate()
+        timer = nil
+        UIView.animate(withDuration: 0.3) {
+            self.resendButton.setTitle("Resend OTP", for: .normal)
+            self.resendButton.alpha = 1.0
+            self.resendButton.isEnabled = true
+        }
+    }
+    
+    // MARK: - Action Methods
     @objc private func verifyButtonPressed() {
-        validateOTP()
+        guard let email = email, let verifyType = verifyType else { return }
+        
+        let otp = textFields.compactMap { $0.text }.joined()
+        startLoading()
+        AuthManager.shared.verifyOTP(email: email, otp: otp, verifyType: verifyType)
     }
     
     @objc private func resendOTPButtonPressed() {
-        if let email = self.email, let verifyType = self.verifyType {
-            AuthManager.shared.resendOTP(email: email, verifyType: verifyType)
-            startResendTimer()
-        }
+        guard let email = email, let verifyType = verifyType else { return }
+        AuthManager.shared.resendOTP(email: email, verifyType: verifyType)
+        startResendTimer()
     }
-
+    
     @objc private func textFieldDidChange(_ textField: UITextField) {
-        guard let text = textField.text, text.count == 1 else {
-            return
-        }
-
+        guard let text = textField.text, text.count == 1 else { return }
+        
         let nextTag = textField.tag + 1
         if nextTag < numberOfDigits {
             textFields[nextTag].becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
-            button.isEnabled = true
-            button.alpha = 1.0
+            enableVerifyButton()
         }
     }
-
-    private func validateOTP() {
-        let otp = textFields.compactMap { $0.text }.joined()
-        print("Entered OTP: \(otp)")
-        AuthManager.shared.verifyOTP(email: email!, otp: otp, verifyType: verifyType!)
-        // Handle OTP validation here
-    }
     
-    func startResendTimer() {
-        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateResendTimer), userInfo: nil, repeats: true)
-    }
-    
-    
-    @objc private func updateResendTimer() {
-        secondsRemaining -= 1
-        if secondsRemaining > 0 {
-            UIView.performWithoutAnimation {
-                resendOTPButton.setTitle("Resend in \(secondsRemaining)s", for: .normal)
-                resendOTPButton.layoutIfNeeded() // Ensure layout is updated smoothly
-            }
-        } else {
-            timer?.invalidate()
-            timer = nil
-            secondsRemaining = 60
-            UIView.performWithoutAnimation {
-                resendOTPButton.setTitle("Resend OTP", for: .normal)
-                resendOTPButton.layoutIfNeeded() // Ensure layout is updated smoothly
-            }
-            resendOTPButton.alpha = 1.0
-            resendOTPButton.isEnabled = true
+    private func enableVerifyButton() {
+        let isComplete = textFields.allSatisfy { $0.text?.count == 1 }
+        UIView.animate(withDuration: 0.3) {
+            self.verifyButton.isEnabled = isComplete
+            self.verifyButton.alpha = isComplete ? 1.0 : 0.5
         }
     }
-}
-
-//MARK: UITextFieldDelegate
-extension OTPViewController: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        // Allow only one character per field
-        guard let text = textField.text else { return false }
-        return text.count == 0 || string == ""
-    }
-}
-
-extension OTPViewController: AuthManagerDelegate {
-    func didResendOTP() {
-        print("did send OTP")
+    
+    private func startLoading() {
+        loadingIndicator.startAnimating()
+        verifyButton.setTitle("", for: .normal)
+        verifyButton.isEnabled = false
     }
     
-    func didVerifyOTP(verificationResult: Bool, result: String) {
-        if verificationResult {
-            DispatchQueue.main.async { [self] in
-                print("I have active from delegate")
-                imageView.image = UIImage(systemName: "checkmark")
-                imageView.tintColor = .systemGreen
-                for textField in self.textFields {
-                    textField.layer.borderColor = UIColor.systemGreen.cgColor
-                }
-                resultLabel.text = result
-                resultLabel.textColor = .systemGreen
-            }
-            
-            switch verifyType{
-            case .signup:
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    self.navigationController?.popToRootViewController(animated: true)
-                }
-            case .magiclink:
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    let vc = MapViewController()
-                    self.navigationController?.pushViewController(vc, animated: true)
-                    self.setRootViewControllerToHome()
-                }
-            case .recovery:
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    let vc = ResetPasswordViewController()
-                    if var navigationController = self.navigationController?.viewControllers {
-                        navigationController.removeLast()
-                        navigationController.append(vc)
-                        self.navigationController?.setViewControllers(navigationController, animated: true)
-                    }
-                }
-            case .none:
-                print("error")
-            }
-        }else {
-            DispatchQueue.main.async{ [self] in
-                imageView.image = UIImage(systemName: "xmark")
-                imageView.tintColor = .systemRed
-                for textField in self.textFields {
-                    textField.layer.borderColor = UIColor.systemRed.cgColor
-                }
-                resultLabel.text = result
-                resultLabel.textColor = .systemRed
-                resultLabel.isHidden = false
-            }
+    private func stopLoading() {
+        loadingIndicator.stopAnimating()
+        verifyButton.setTitle("Verify", for: .normal)
+        verifyButton.isEnabled = true
+    }
+    
+    private func handleSuccess() {
+        UIView.animate(withDuration: 0.3) {
+            self.imageView.image = UIImage(systemName: "checkmark.circle.fill")
+            self.imageView.tintColor = .systemGreen
+            self.textFields.forEach { $0.backgroundColor = .systemGreen.withAlphaComponent(0.1) }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.navigateAfterSuccess()
+        }
+    }
+    
+    private func handleError(_ message: String) {
+        UIView.animate(withDuration: 0.3) {
+            self.imageView.image = UIImage(systemName: "xmark.circle.fill")
+            self.imageView.tintColor = .systemRed
+            self.textFields.forEach { $0.backgroundColor = .systemRed.withAlphaComponent(0.1) }
+            self.resultLabel.text = message
+            self.resultLabel.textColor = .systemRed
+            self.resultLabel.isHidden = false
+        }
+    }
+    
+    private func navigateAfterSuccess() {
+        switch verifyType {
+        case .signup:
+            navigationController?.popToRootViewController(animated: true)
+        case .magiclink:
+            let tabBarController = TabBarController()
+            setRootViewController(tabBarController)
+        case .recovery:
+            let resetPasswordVC = ResetPasswordViewController()
+            navigationController?.setViewControllers([resetPasswordVC], animated: true)
+        case .none:
+            break
         }
     }
     
     @MainActor
-    private func setRootViewControllerToHome() {
-        let tabBarController = TabBarController()
-        let navigationController = UINavigationController(rootViewController: tabBarController)
-//        navigationController.navigationBar.prefersLargeTitles = true
-
+    private func setRootViewController(_ viewController: UIViewController) {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first else {
-            return
-        }
-
+              let window = windowScene.windows.first else { return }
+        
+        let navigationController = UINavigationController(rootViewController: viewController)
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
-
-        UIView.transition(with: window,
-                          duration: 0.5,
-                          options: [.transitionFlipFromRight],
-                          animations: nil,
-                          completion: nil)
+        
+        UIView.transition(with: window, duration: 0.5,
+                         options: .transitionFlipFromRight,
+                         animations: nil, completion: nil)
     }
 }
 
-#Preview {
-    OTPViewController()
+// MARK: - UITextFieldDelegate
+extension OTPViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField,
+                  shouldChangeCharactersIn range: NSRange,
+                  replacementString string: String) -> Bool {
+        guard let text = textField.text else { return false }
+        return text.count + string.count <= 1
+    }
+}
+
+// MARK: - AuthManagerDelegate
+extension OTPViewController: AuthManagerDelegate {
+    func didResendOTP() {
+        print("OTP resent successfully")
+    }
+    
+    func didVerifyOTP(verificationResult: Bool, result: String) {
+        DispatchQueue.main.async {
+            self.stopLoading()
+            if verificationResult {
+                self.handleSuccess()
+            } else {
+                self.handleError(result)
+            }
+        }
+    }
 }

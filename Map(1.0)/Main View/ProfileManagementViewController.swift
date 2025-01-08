@@ -1,6 +1,6 @@
-// Import necessary libraries
-import UIKit
 
+import UIKit
+import Supabase
 // Define a Profile Management View Controller
 class ProfileManagementViewController: UIViewController {
     // MARK: - Properties
@@ -14,6 +14,9 @@ class ProfileManagementViewController: UIViewController {
     private let walletLabel = UILabel()
     private let ordersLabel = UILabel()
     private let optionsStackView = UIStackView()
+    private let usernameTextField = UITextField()
+    private let emailTextField = UITextField()
+    private let saveButton = UIButton()
     
     // MARK: - View Lifecycle
     override func viewDidLoad() {
@@ -157,6 +160,3 @@ class ProfileManagementViewController: UIViewController {
     }
 }
 
-#Preview {
-    ProfileManagementViewController()
-}

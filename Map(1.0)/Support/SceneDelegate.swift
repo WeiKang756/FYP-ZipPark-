@@ -12,18 +12,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Ensure the scene is of type UIWindowScene
-        guard (scene is UIWindowScene) else { return }
-//        guard let windowScene = (scene as? UIWindowScene) else { return }
-
-        // Create the window using the current windowScene
-//        window = UIWindow(windowScene: windowScene)
-//        window?.frame = windowScene.coordinateSpace.bounds
-//
-//        // Set up the root view controller
-//        let vc = MapViewController() // Replace this with your initial view controller, e.g., SignInViewController or TabBarController
-//        window?.rootViewController = vc
-//        window?.makeKeyAndVisible()
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        window = UIWindow(windowScene: windowScene)
+        
+        let rootViewController = LoginViewController()
+        let navigationController = UINavigationController(rootViewController: rootViewController)
+        
+        // Configure navigation bar appearance
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .black // or your preferred color
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        navigationController.navigationBar.standardAppearance = appearance
+        navigationController.navigationBar.scrollEdgeAppearance = appearance
+        navigationController.navigationBar.compactAppearance = appearance
+        
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
     }
 
     
