@@ -200,6 +200,7 @@ struct MapManager {
                     .eq("isAvailable", value: true)
                     .execute()
                     .value
+                print("Sucessful fetch parking spot data")
                 
                 var parkingSpotModels: [ParkingSpotModel] = []
                 
@@ -222,6 +223,7 @@ struct MapManager {
                 }
                 
                 parkingSpotModels.sort { $0.distance! < $1.distance! }
+                print("Sucessful fetch parking spot model")
                 delegate?.didFetchParkingSpotData(parkingSpotModels)
                 
             } catch {

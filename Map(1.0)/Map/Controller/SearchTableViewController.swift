@@ -4,16 +4,17 @@ import FloatingPanel
 
 protocol SearchTextFieldDelegate {
     func searchTextFieldDidSelect()
+    func nearestParkingSpotDidSelect(_ selectedParkingSpot: ParkingSpotModel)
 }
 
 class SearchTableViewController: UIViewController {
     
     // MARK: - Properties
-    var areaModel: [AreaModel]?
+    private var parkingSpots: [ParkingSpotModel] = []
+    private var filteredParkingSpots: [ParkingSpotModel] = []
     var userLocation: UserLocation?
     let mapManager = MapManager()
     var targetViewController: MapViewController?
-    var parkingFinderTableCellDelegate: ParkingFinderTableViewCellDelegate?
     var delegate: SearchTextFieldDelegate?
     weak var fpc: FloatingPanelController?
     
@@ -42,12 +43,9 @@ class SearchTableViewController: UIViewController {
     let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(UINib(nibName: "ParkingFinderTableViewCell", bundle: nil),
-                         forCellReuseIdentifier: "ParkingFinderCell")
         tableView.register(UINib(nibName: "TableViewCell", bundle: nil),
                          forCellReuseIdentifier: "UserLocationCell")
-        tableView.register(UINib(nibName: "AreaListTableViewCell", bundle: nil),
-                         forCellReuseIdentifier: "AreaListCell")
+        tableView.register(ParkingSpotCell.self, forCellReuseIdentifier: "ParkingSpotCell")
         return tableView
     }()
     
@@ -67,8 +65,6 @@ class SearchTableViewController: UIViewController {
         searchTextField.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
-        
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         setupConstraints()
     }
@@ -93,8 +89,9 @@ class SearchTableViewController: UIViewController {
         tableView.reloadData()
     }
     
-    func getAreaData(areaModels: [AreaModel]) {
-        self.areaModel = areaModels
+    
+    func updateParkingSpots(_ spots: [ParkingSpotModel]) {
+        self.parkingSpots = spots.sorted { $0.distance ?? 0 < $1.distance ?? 0 }
         tableView.reloadData()
     }
 }
@@ -113,69 +110,48 @@ extension SearchTableViewController: FloatingPanelControllerDelegate {
     func floatingPanelDidChangeState(_ fpc: FloatingPanelController) {
         self.fpc = fpc
         tableView.reloadData()
+        
+        if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
+            let topIndexPath = IndexPath(row: 0, section: 0)
+            tableView.scrollToRow(at: topIndexPath, at: .top, animated: true)
+        }
     }
 }
 
 // MARK: - UITableViewDataSource
 extension SearchTableViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return fpc?.state == .full ? 3 : 2
+        return 2 // User location and parking spots
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 || section == 1 {
-            return 1
+        if section == 0 {
+            return 1 // User location cell
         } else {
-            if let areaModel = areaModel {
-                return fpc?.state == .full ? areaModel.count : 0
-            }
-            return fpc?.state == .full ? 1 : 0
+            return parkingSpots.count // Parking spots
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.section {
-        case 0:
+        if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "UserLocationCell",
                                                     for: indexPath) as! TableViewCell
             cell.userLocationLabel.text = userLocation?.streetName ?? "Not Found"
             return cell
-            
-        case 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ParkingFinderCell",
-                                                    for: indexPath) as! ParkingFinderTableViewCell
-            cell.delegate = parkingFinderTableCellDelegate
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ParkingSpotCell",
+                                                    for: indexPath) as! ParkingSpotCell
+            let parkingSpot = parkingSpots[indexPath.row]
+            cell.configure(with: parkingSpot)
             return cell
-            
-        default:
-            if let areaModel = areaModel {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "AreaListCell",
-                                                        for: indexPath) as! AreaListTableViewCell
-                
-                if let distance = areaModel[indexPath.row].distance {
-                    let distanceString = distance > 1000 ?
-                        String(format: "%.1f KM", distance/1000) :
-                        String(format: "%.0f M", distance)
-                    cell.distanceLabel.text = distanceString
-                }
-                
-                cell.areaName.text = areaModel[indexPath.row].areaName
-                cell.availableLabel.text = areaModel[indexPath.row].availableParkingString
-                return cell
-            } else {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = "N/A"
-                cell.alpha = 0.0
-                return cell
-            }
         }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0: return "User Location"
-        case 1: return "Parking Finder"
-        default: return fpc?.state == .full ? "Area" : nil
+        case 1: return "Nearby Parking Spots"
+        default: return nil
         }
     }
 }
@@ -194,5 +170,13 @@ extension SearchTableViewController: UITableViewDelegate {
         let footerView = UIView()
         footerView.backgroundColor = .clear
         return footerView
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 1 {
+            let selectedSpot = parkingSpots[indexPath.row]
+            delegate?.nearestParkingSpotDidSelect(selectedSpot)
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
