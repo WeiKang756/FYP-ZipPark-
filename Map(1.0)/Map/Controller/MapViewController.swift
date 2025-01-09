@@ -179,6 +179,7 @@ extension MapViewController: CLLocationManagerDelegate{
 
                 self.userLocation = UserLocation(streetName: street, city: city, location: location)
                 if let userLocation = self.userLocation {
+                    self.contentViewController.showLoading()
                     self.contentViewController.getUserLocation(userLocation: userLocation)
                     self.mapManager.userLocation = userLocation
                     self.mapManager.fetchAreaData()

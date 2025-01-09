@@ -28,10 +28,12 @@ struct ParkingSpotData: Decodable {
 
 struct Street: Decodable {
     let streetName: String
+    let streetID: Int
     let area: Area  // Changed from 'Area' to 'area'
     
     enum CodingKeys: String, CodingKey {
         case streetName
+        case streetID = "streetID"
         case area = "Area"  // Added coding key to match JSON structure
     }
 }

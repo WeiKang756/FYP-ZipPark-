@@ -21,6 +21,7 @@ struct ParkingListManager {
                     .select("""
                             *, 
                             Street!inner(
+                                streetID,
                                 streetName,
                                 Area!inner(
                                     areaName

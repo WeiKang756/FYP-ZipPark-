@@ -18,7 +18,47 @@ class SearchTableViewController: UIViewController {
     var delegate: SearchTextFieldDelegate?
     weak var fpc: FloatingPanelController?
     
+    // MARK: - Loading State
+    private var isLoading: Bool = false {
+        didSet {
+            DispatchQueue.main.async {
+                if self.isLoading {
+                    self.loadingIndicator.startAnimating()
+                    self.loadingView.isHidden = false
+                } else {
+                    self.loadingIndicator.stopAnimating()
+                    self.loadingView.isHidden = true
+                }
+            }
+        }
+    }
+    
     // MARK: - UI Components
+    private lazy var loadingView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBackground.withAlphaComponent(0.7)
+        view.isHidden = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.color = .systemBlue
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    private lazy var loadingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Finding nearest parking spots..."
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.textColor = .systemGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     let searchTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Search for Parking Lots"
@@ -59,9 +99,14 @@ class SearchTableViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemGray6
         
+        // Add subviews
         view.addSubview(searchTextField)
         view.addSubview(tableView)
+        view.addSubview(loadingView)
+        loadingView.addSubview(loadingIndicator)
+        loadingView.addSubview(loadingLabel)
         
+        // Setup delegates
         searchTextField.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
@@ -71,15 +116,31 @@ class SearchTableViewController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            // Search TextField
             searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             searchTextField.heightAnchor.constraint(equalToConstant: 30),
             
+            // Table View
             tableView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 10),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            // Loading View
+            loadingView.topAnchor.constraint(equalTo: tableView.topAnchor),
+            loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            // Loading Indicator
+            loadingIndicator.centerXAnchor.constraint(equalTo: loadingView.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: loadingView.centerYAnchor),
+            
+            // Loading Label
+            loadingLabel.topAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 12),
+            loadingLabel.centerXAnchor.constraint(equalTo: loadingView.centerXAnchor)
         ])
     }
     
@@ -89,10 +150,18 @@ class SearchTableViewController: UIViewController {
         tableView.reloadData()
     }
     
-    
     func updateParkingSpots(_ spots: [ParkingSpotModel]) {
-        self.parkingSpots = spots.sorted { $0.distance ?? 0 < $1.distance ?? 0 }
+        isLoading = false
+        self.parkingSpots = spots
         tableView.reloadData()
+    }
+    
+    func showLoading() {
+        isLoading = true
+    }
+    
+    func hideLoading() {
+        isLoading = false
     }
 }
 
@@ -109,8 +178,6 @@ extension SearchTableViewController: UITextFieldDelegate {
 extension SearchTableViewController: FloatingPanelControllerDelegate {
     func floatingPanelDidChangeState(_ fpc: FloatingPanelController) {
         self.fpc = fpc
-        tableView.reloadData()
-        
         if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
             let topIndexPath = IndexPath(row: 0, section: 0)
             tableView.scrollToRow(at: topIndexPath, at: .top, animated: true)
