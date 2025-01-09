@@ -116,6 +116,7 @@ struct MapManager {
                         .select("""
                             *, 
                             Street!inner(
+                                streetID,
                                 streetName,
                                 Area!inner(
                                     areaName
@@ -186,11 +187,13 @@ struct MapManager {
                     return
                 }
                 
+                // 1. First fetch parking spots with street information
                 let parkingSpotsData: [ParkingSpotData] = try await supabase
                     .from("ParkingSpot")
                     .select("""
                         *, 
                         Street!inner(
+                            streetID,
                             streetName,
                             Area!inner(
                                 areaName
@@ -200,8 +203,28 @@ struct MapManager {
                     .eq("isAvailable", value: true)
                     .execute()
                     .value
-                print("Sucessful fetch parking spot data")
                 
+                print("Successfully fetched parking spot data")
+                
+                // 2. Group spots by street to efficiently fetch street info
+                let groupedByStreet = Dictionary(grouping: parkingSpotsData) { $0.street.streetName }
+                
+                // 3. Create dictionary to store street info
+                var streetInfoDict: [String: StreetInfoData] = [:]
+                
+                // 4. Fetch street info for each unique street
+                for (_, spots) in groupedByStreet {
+                    if let firstSpot = spots.first {
+                        let streetInfo: StreetInfoData = try await supabase
+                            .rpc("get_available_parking_count_by_type_street", params: ["street_id": firstSpot.street.streetID])
+                            .single()
+                            .execute()
+                            .value
+                        streetInfoDict[firstSpot.street.streetName] = streetInfo
+                    }
+                }
+                
+                // 5. Create ParkingSpotModels array
                 var parkingSpotModels: [ParkingSpotModel] = []
                 
                 for parkingSpotData in parkingSpotsData {
@@ -222,10 +245,15 @@ struct MapManager {
                     parkingSpotModels.append(parkingSpotModel)
                 }
                 
-                parkingSpotModels.sort { $0.distance! < $1.distance! }
-                print("Sucessful fetch parking spot model")
-                delegate?.didFetchParkingSpotData(parkingSpotModels)
+                // 6. Sort using the new ParkingSpotSorter
+                let sortedSpots = ParkingSpotSorter.sortParkingSpots(
+                    spots: parkingSpotModels,
+                    streetInfo: streetInfoDict
+                )
                 
+                // 7. Send sorted results to delegate
+                print("Successfully sorted parking spots")
+                delegate?.didFetchParkingSpotData(sortedSpots)
             } catch {
                 print("Error fetching parking spot data: \(error.localizedDescription)")
             }

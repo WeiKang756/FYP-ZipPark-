@@ -11,6 +11,7 @@ struct StreetInfoData: Decodable {
     let numYellow: Int
     let numDisable: Int
     let numAvailable: Int
+    let totalSpots: Int
     
     enum CodingKeys: String, CodingKey {
         case numGreen = "green"
@@ -18,5 +19,6 @@ struct StreetInfoData: Decodable {
         case numYellow = "yellow"
         case numDisable = "disable"
         case numAvailable = "total_available"
+        case totalSpots = "total_spots"
     }
 }
