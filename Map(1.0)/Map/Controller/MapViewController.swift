@@ -61,7 +61,6 @@ class MapViewController: UIViewController {
         setupMap()
         setupInfomationPanel()
         floatingPanelController.delegate = contentViewController
-        contentViewController.parkingFinderTableCellDelegate = self
         contentViewController.delegate = self
         floatingPanelController.set(contentViewController: contentViewController)
         floatingPanelController.layout = CustomFloatingPanelLayout()
@@ -183,6 +182,7 @@ extension MapViewController: CLLocationManagerDelegate{
                     self.contentViewController.getUserLocation(userLocation: userLocation)
                     self.mapManager.userLocation = userLocation
                     self.mapManager.fetchAreaData()
+                    self.mapManager.fetchParkingSpotData()
                 }
             }
         }
@@ -460,10 +460,6 @@ extension MapViewController: MapManagerDelegate {
                 area: area
             )
         }
-        
-        DispatchQueue.main.async {
-            self.contentViewController.getAreaData(areaModels: areasModel)
-        }
     }
     
     func didFetchStreetAndParkingSpotData(_ streetsModel: [StreetModel]) {
@@ -477,21 +473,8 @@ extension MapViewController: MapManagerDelegate {
     
     func didFetchParkingSpotData(_ availableParkingSpotModel: [ParkingSpotModel]) {
         DispatchQueue.main.async {
-            self.setupNearestParkingPanel(with: availableParkingSpotModel)
+            self.contentViewController.updateParkingSpots(availableParkingSpotModel)
         }
-    }
-    
-    private func setupNearestParkingPanel(with parkingSpots: [ParkingSpotModel]) {
-        floatingPanelController.hide(animated: true)
-        
-        let contentVC = NearestParkingViewController()
-        contentVC.availableParkingSpotModel = parkingSpots
-        contentVC.mapManager = mapManager
-        contentVC.delegate = self
-        
-        nearestParkingfloatingPanel.surfaceView.appearance.cornerRadius = 12.0
-        nearestParkingfloatingPanel.set(contentViewController: contentVC)
-        nearestParkingfloatingPanel.addPanel(toParent: self)
     }
 }
 //MARK: - AreaInformationViewControllerDelegate
@@ -558,6 +541,19 @@ extension MapViewController: ParkingFinderTableViewCellDelegate {
 }
 
 extension MapViewController: SearchTextFieldDelegate {
+    func nearestParkingSpotDidSelect(_ selectedParkingSpot: ParkingSpotModel) {
+        areaAnnotations = mapView.annotations
+        mapView.deselectAnnotation(selectedAreaAnnotation, animated: false)
+        mapView.removeAnnotations(mapView.annotations)// remove all annotation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let parkingLocation = CLLocationCoordinate2D(latitude: selectedParkingSpot.latitude, longitude: selectedParkingSpot.longitude)
+            let stringParkingLotID = String(selectedParkingSpot.parkingSpotID)
+            let annotation = ParkingAnnotation(parkingLotID: stringParkingLotID, coordinate: parkingLocation, parkingSpotModel: selectedParkingSpot)
+            self.mapView.addAnnotation(annotation)
+            self.mapView.selectAnnotation(annotation, animated: true)
+        }
+    }
+    
     func searchTextFieldDidSelect() {
 
         let parkingSpotListVC = ParkingSpotListViewController()
