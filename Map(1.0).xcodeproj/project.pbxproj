@@ -73,6 +73,9 @@
 		11779A062D130084008F6889 /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11779A052D13006A008F6889 /* HistoryManager.swift */; };
 		11779A082D1315F5008F6889 /* ParkingSessionDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11779A072D1315F5008F6889 /* ParkingSessionDetailViewController.swift */; };
 		11779A0A2D134A69008F6889 /* ParkingSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11779A092D134A5C008F6889 /* ParkingSessionManager.swift */; };
+		11782FF82D2FDE2B00232AC4 /* ParkingSpotSorter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11782FF72D2FDE2B00232AC4 /* ParkingSpotSorter.swift */; };
+		11782FFA2D2FEFE000232AC4 /* SessionExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11782FF92D2FEFE000232AC4 /* SessionExtensionManager.swift */; };
+		11782FFC2D301CD100232AC4 /* SessionExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11782FFB2D301CD100232AC4 /* SessionExtensionViewController.swift */; };
 		117C17C52CE546570034594E /* VehicleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C17C42CE5464F0034594E /* VehicleManager.swift */; };
 		117C17C72CE5B8C90034594E /* VehicleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C17C62CE5B8A20034594E /* VehicleModel.swift */; };
 		117F63BD2D0EDE9100558A9F /* ReportSystemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117F63BC2D0EDE9100558A9F /* ReportSystemViewController.swift */; };
@@ -223,6 +226,9 @@
 		11779A052D13006A008F6889 /* HistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryManager.swift; sourceTree = "<group>"; };
 		11779A072D1315F5008F6889 /* ParkingSessionDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingSessionDetailViewController.swift; sourceTree = "<group>"; };
 		11779A092D134A5C008F6889 /* ParkingSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingSessionManager.swift; sourceTree = "<group>"; };
+		11782FF72D2FDE2B00232AC4 /* ParkingSpotSorter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingSpotSorter.swift; sourceTree = "<group>"; };
+		11782FF92D2FEFE000232AC4 /* SessionExtensionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionExtensionManager.swift; sourceTree = "<group>"; };
+		11782FFB2D301CD100232AC4 /* SessionExtensionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionExtensionViewController.swift; sourceTree = "<group>"; };
 		117C17C42CE5464F0034594E /* VehicleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleManager.swift; sourceTree = "<group>"; };
 		117C17C62CE5B8A20034594E /* VehicleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleModel.swift; sourceTree = "<group>"; };
 		117F63BC2D0EDE9100558A9F /* ReportSystemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSystemViewController.swift; sourceTree = "<group>"; };
@@ -378,6 +384,8 @@
 		114BA2A32C9ADA5400009B31 /* Map(1.0) */ = {
 			isa = PBXGroup;
 			children = (
+				11782FFB2D301CD100232AC4 /* SessionExtensionViewController.swift */,
+				11782FF92D2FEFE000232AC4 /* SessionExtensionManager.swift */,
 				11779A092D134A5C008F6889 /* ParkingSessionManager.swift */,
 				11779A072D1315F5008F6889 /* ParkingSessionDetailViewController.swift */,
 				11779A052D13006A008F6889 /* HistoryManager.swift */,
@@ -449,6 +457,7 @@
 		114BA31A2C9E098800009B31 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				11782FF72D2FDE2B00232AC4 /* ParkingSpotSorter.swift */,
 				113B113B2CAD5FDE0042D5F2 /* MapManager.swift */,
 				113B11492CAF33BB0042D5F2 /* Annotation */,
 				113B11482CAF339A0042D5F2 /* Model */,
@@ -855,11 +864,13 @@
 				11E86E942CC56F8E00A54A46 /* AreaInformationViewController.swift in Sources */,
 				11A5AD832CEAF19900774D00 /* ParkingStartViewController.swift in Sources */,
 				117F63BD2D0EDE9100558A9F /* ReportSystemViewController.swift in Sources */,
+				11782FFC2D301CD100232AC4 /* SessionExtensionViewController.swift in Sources */,
 				1151872C2CEA008000B21AC4 /* ZoneInfoTableViewCell.swift in Sources */,
 				114BA31C2C9E0B6B00009B31 /* AreaModel.swift in Sources */,
 				11158FC72CE176D9006F7255 /* AvailableParkingData.swift in Sources */,
 				11158FC52CE17667006F7255 /* AvailableParkingSpotModel.swift in Sources */,
 				11A5AD902CEBDE2700774D00 /* ParkingCostResponse.swift in Sources */,
+				11782FFA2D2FEFE000232AC4 /* SessionExtensionManager.swift in Sources */,
 				113B113E2CAD66F00042D5F2 /* StreetModel.swift in Sources */,
 				11D589442CAF379A001A10BE /* ParkingSpotModel.swift in Sources */,
 				113B11462CAF33530042D5F2 /* ParkingSpotData.swift in Sources */,
@@ -932,6 +943,7 @@
 				11779A022D12FCF0008F6889 /* ParkingHistoryCell.swift in Sources */,
 				11D589462CB1BF5D001A10BE /* StreetData.swift in Sources */,
 				114BA2A72C9ADA5400009B31 /* SceneDelegate.swift in Sources */,
+				11782FF82D2FDE2B00232AC4 /* ParkingSpotSorter.swift in Sources */,
 				11F941622D1477EF004EA201 /* TransactionTableViewCell.swift in Sources */,
 				113B11442CADBFCB0042D5F2 /* AreaData.swift in Sources */,
 				11E5FB292CDA9132005B5D0B /* AuthStateListener.swift in Sources */,

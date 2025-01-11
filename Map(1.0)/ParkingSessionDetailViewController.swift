@@ -2,6 +2,7 @@ import UIKit
 
 class ParkingSessionDetailViewController: UIViewController {
     
+    // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.backgroundColor = .systemGray6
@@ -15,27 +16,27 @@ class ParkingSessionDetailViewController: UIViewController {
         return view
     }()
     
-    // Cards
+    private let extendButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Extend Session", for: .normal)
+        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private let sessionCard = DetailCard()
     private let locationCard = DetailCard()
     private let vehicleCard = DetailCard()
     private let paymentCard = DetailCard()
     
-    // Example session data (replace with actual session when needed)
+    // MARK: - Properties
     private var dummySession: ParkingSession? = nil
-    private var parkingSessionManager = ParkingSessionManager()
+    private let parkingSessionManager = ParkingSessionManager()
+    private let sessionManager = SessionExtensionManager()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-        configureCards()
-        navigationItem.title = "Session Detail"
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.largeTitleDisplayMode = .never
-        parkingSessionManager.delegate = self
-    }
-    
-    
+    // MARK: - Lifecycle
     init(session: ParkingSession) {
         self.dummySession = session
         super.init(nibName: nil, bundle: nil)
@@ -45,9 +46,28 @@ class ParkingSessionDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        configureCards()
+        navigationItem.title = "Session Detail"
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
+        parkingSessionManager.delegate = self
+        sessionManager.delegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateExtendButtonState()
+    }
+    
+    // MARK: - UI Setup
     private func setupUI() {
         title = "Session Details"
         view.backgroundColor = .systemBackground
+        
+        setupExtendButton()
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -60,7 +80,7 @@ class ParkingSessionDetailViewController: UIViewController {
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: extendButton.topAnchor, constant: -20),
             
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -87,22 +107,61 @@ class ParkingSessionDetailViewController: UIViewController {
         ])
     }
     
-    let timeFormatter: DateFormatter = {
+    private func setupExtendButton() {
+        view.addSubview(extendButton)
+        
+        NSLayoutConstraint.activate([
+            extendButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            extendButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            extendButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            extendButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+        
+        extendButton.addTarget(self, action: #selector(extendButtonTapped), for: .touchUpInside)
+    }
+    
+    private func updateExtendButtonState() {
+        guard let parkingSession = dummySession else { return }
+        
+        let endTime = DateFormatterUtility.shared.dateFromString(parkingSession.endTime)
+        let isExpired = endTime?.compare(Date()) == .orderedAscending
+        
+        extendButton.isEnabled = !isExpired && parkingSession.status == "active"
+        extendButton.backgroundColor = isExpired || parkingSession.status != "active" ? .systemGray3 : .systemBlue
+        
+        if isExpired {
+            extendButton.setTitle("Session Expired", for: .disabled)
+        } else if parkingSession.status != "active" {
+            extendButton.setTitle("Session Inactive", for: .disabled)
+        } else {
+            extendButton.setTitle("Extend Session", for: .normal)
+        }
+    }
+    
+    // MARK: - Actions
+    @objc private func extendButtonTapped() {
+        guard let parkingSession = dummySession else { return }
+        let vc = SessionExtensionViewController(parkingType: parkingSession.parkingSpot.type)
+        vc.delegate = self
+        present(vc, animated: true)
+    }
+    
+    // MARK: - Helpers
+    private let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSSSSSZZZZZ"
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         return formatter
     }()
-
-    func formatTime(_ timeString: String) -> String {
-        // Convert to readable time format (e.g., "7:16 PM")
+    
+    private func formatTime(_ timeString: String) -> String {
         if let date = timeFormatter.date(from: timeString) {
             let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "h:mm a" // This will give format like "7:16 PM"
+            outputFormatter.dateFormat = "h:mm a"
             return outputFormatter.string(from: date)
         }
-        return timeString // Return original string if parsing fails
+        return timeString
     }
     
     private func formatDuration(_ durationString: String) -> String {
@@ -116,10 +175,8 @@ class ParkingSessionDetailViewController: UIViewController {
     }
     
     private func configureCards() {
-        // Session Card
-        guard let dummySession = dummySession else {
-            return
-        }
+        guard let dummySession = dummySession else { return }
+        
         sessionCard.configure(
             title: "Session Information",
             icon: "clock.fill",
@@ -132,7 +189,6 @@ class ParkingSessionDetailViewController: UIViewController {
             ]
         )
         
-        // Location Card
         locationCard.configure(
             title: "Location",
             icon: "mappin.circle.fill",
@@ -144,7 +200,6 @@ class ParkingSessionDetailViewController: UIViewController {
             ]
         )
         
-        // Vehicle Card
         vehicleCard.configure(
             title: "Vehicle Information",
             icon: "car.fill",
@@ -153,7 +208,6 @@ class ParkingSessionDetailViewController: UIViewController {
             ]
         )
         
-        // Payment Card
         paymentCard.configure(
             title: "Payment Information",
             icon: "creditcard.fill",
@@ -165,11 +219,74 @@ class ParkingSessionDetailViewController: UIViewController {
     }
 }
 
+// MARK: - Extensions
+extension ParkingSessionDetailViewController {
+    func showErrorAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func showSuccessAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Success",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func updateSessionDetails() {
+        guard let sessionId = dummySession?.id else { return }
+        guard let sessionUUID = UUID(uuidString: sessionId) else {
+            print("Invalid session ID format")
+            return
+        }
+        parkingSessionManager.getSessionStart(sessionUUID)
+    }
+}
+
 extension ParkingSessionDetailViewController: ParkingSessionManagerDelegate {
     func didFetchSession(_ parkingSession: ParkingSession) {
         dummySession = parkingSession
         DispatchQueue.main.async {
             self.configureCards()
+            self.updateExtendButtonState()
+        }
+    }
+}
+
+extension ParkingSessionDetailViewController: SessionExtensionViewControllerDelegate {
+    func didSelectExtension(duration: String, estimatedCost: Double) {
+        guard let sessionId = dummySession?.id else { return }
+        guard let sessionUUID = UUID(uuidString: sessionId) else {
+            print("Invalid session ID format")
+            return
+        }
+        sessionManager.extendSession(
+            sessionId: sessionUUID,
+            additionalTime: duration,
+            estimatedCost: estimatedCost
+        )
+    }
+}
+
+extension ParkingSessionDetailViewController: SessionExtensionManagerDelegate {
+    func failedToExtendSession(_ error: SessionExtensionError) {
+        DispatchQueue.main.async {
+            self.showErrorAlert(message: error.message)
+        }
+    }
+    
+    func didExtendSession(_ response: SessionExtensionResponse) {
+        DispatchQueue.main.async {
+            self.updateSessionDetails()
+            self.showSuccessAlert(message: "Session extended successfully")
         }
     }
 }
