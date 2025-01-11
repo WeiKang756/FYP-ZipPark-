@@ -35,6 +35,7 @@ struct HistoryManager {
                             type,
                             isAvailable,
                             Street (
+                                streetID,
                                 streetName,
                                 Area (
                                     areaName
