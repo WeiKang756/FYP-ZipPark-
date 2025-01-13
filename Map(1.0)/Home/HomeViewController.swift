@@ -148,7 +148,7 @@ class HomeViewController: UIViewController {
     
     @objc private func profileButtonTapped() {
         // Handle profile button tap
-        let profileVC = ProfileManagementViewController() // Create your profile view controller
+        let profileVC = ProfileViewController() // Create your profile view controller
         navigationController?.pushViewController(profileVC, animated: true)
     }
     
