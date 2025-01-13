@@ -4,8 +4,6 @@
 //
 //  Created by Wei Kang Tan on 11/01/2025.
 //
-
-
 import UIKit
 
 class ProfileViewController: UIViewController {
@@ -72,20 +70,10 @@ class ProfileViewController: UIViewController {
     
     private let balanceLabel: UILabel = {
         let label = UILabel()
-        label.text = "RM 150.00"
+        label.text = "RM 0.00"
         label.font = .systemFont(ofSize: 24, weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
-    }()
-    
-    private let topUpButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Top up", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemBlue
-        button.layer.cornerRadius = 16
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
     }()
     
     private let menuCard: UIView = {
@@ -114,11 +102,19 @@ class ProfileViewController: UIViewController {
         return button
     }()
     
+    private let supabase = SupabaseManager.shared
+    private var profileManager = ProfileManager()
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         createMenuItems()
+        profileManager.delegate = self
+        profileManager.getUserName()
+        profileManager.getUserEmail()
+        profileManager.getWalletAmount()
+        signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Setup
@@ -135,7 +131,6 @@ class ProfileViewController: UIViewController {
         view.addSubview(walletCard)
         walletCard.addSubview(walletTitleLabel)
         walletCard.addSubview(balanceLabel)
-        walletCard.addSubview(topUpButton)
         
         view.addSubview(menuCard)
         menuCard.addSubview(menuStack)
@@ -171,10 +166,6 @@ class ProfileViewController: UIViewController {
             balanceLabel.topAnchor.constraint(equalTo: walletTitleLabel.bottomAnchor, constant: 4),
             balanceLabel.leadingAnchor.constraint(equalTo: walletCard.leadingAnchor, constant: 20),
             
-            topUpButton.centerYAnchor.constraint(equalTo: walletCard.centerYAnchor),
-            topUpButton.trailingAnchor.constraint(equalTo: walletCard.trailingAnchor, constant: -20),
-            topUpButton.widthAnchor.constraint(equalToConstant: 74),
-            topUpButton.heightAnchor.constraint(equalToConstant: 32),
             
             // Menu Card
             menuCard.topAnchor.constraint(equalTo: walletCard.bottomAnchor, constant: 16),
@@ -196,7 +187,6 @@ class ProfileViewController: UIViewController {
     
     private func createMenuItems() {
         let menuItems = [
-            ("Edit Profile", #selector(editProfileTapped)),
             ("Change Password", #selector(changePasswordTapped)),
             ("My Vehicles", #selector(myVehiclesTapped)),
             ("Parking History", #selector(parkingHistoryTapped))
@@ -263,17 +253,20 @@ class ProfileViewController: UIViewController {
     }
     
     @objc private func changePasswordTapped() {
-        // TODO: Handle change password
+        let changePasswordVC = ChangePasswordViewController()
+        navigationController?.pushViewController(changePasswordVC, animated: true)
         print("Change password tapped")
     }
     
     @objc private func myVehiclesTapped() {
-        // TODO: Handle my vehicles
+        let vc = VehicleViewController()
+        navigationController?.pushViewController(vc, animated: true)
         print("My vehicles tapped")
     }
     
     @objc private func parkingHistoryTapped() {
-        // TODO: Handle parking history
+        let vc = HistoryViewController()
+        navigationController?.pushViewController(vc, animated: true)
         print("Parking history tapped")
     }
     
@@ -283,8 +276,46 @@ class ProfileViewController: UIViewController {
     }
     
     @objc private func signOutButtonTapped() {
-        // TODO: Handle sign out
+        let alert = UIAlertController(
+            title: "Sign Out",
+            message: "Are you sure you want to sign out?",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Sign Out", style: .destructive) { [weak self] _ in
+            self?.supabase.signOut()
+        })
+        present(alert, animated: true)
         print("Sign out tapped")
+    }
+}
+
+extension ProfileViewController: ProfileManagerDelegate {
+    func didGetWalletAmount(_ wallet: WalletData) {
+        DispatchQueue.main.async { [weak self] in
+            self?.balanceLabel.text = String(format: "RM %.2f", wallet.amount)
+        }
+    }
+    
+    func didGetUserEmail(_ userEmail: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.emailLabel.text = userEmail
+        }
+    }
+    
+    func didGetUserName(_ userName: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.nameLabel.text = userName
+            
+            // Set initials based on name
+            let initials = userName.components(separatedBy: " ")
+                .compactMap { $0.first }
+                .prefix(2)
+                .map(String.init)
+                .joined()
+            self?.initialsLabel.text = initials
+        }
     }
 }
 
